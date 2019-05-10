@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Polly;
 using RightmoveDownloader.Services;
 
 namespace RightmoveDownloader
@@ -20,7 +21,12 @@ namespace RightmoveDownloader
 		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
         {
-			services.AddHttpClient();
+			services.AddHttpClient("test", x=> { }).AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
+			{
+				TimeSpan.FromSeconds(1),
+				TimeSpan.FromSeconds(5),
+				TimeSpan.FromSeconds(10)
+			}));
 			services.AddTransient<IRightmoveDownloadService, RightmoveDownloadService>();
 			services.AddHangfire(config =>
 			{
