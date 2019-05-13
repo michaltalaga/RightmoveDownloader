@@ -7,10 +7,12 @@ namespace RightmoveDownloader.Services
 	public partial class RightmoveDownloadService : IRightmoveDownloadService
 	{
 		private readonly IRightmoveHttpClient rightmoveHttpClient;
+		private readonly IPropertyRepository propertiesRepository;
 
-		public RightmoveDownloadService(IRightmoveHttpClient rightmoveHttpClient)
+		public RightmoveDownloadService(IRightmoveHttpClient rightmoveHttpClient, IPropertyRepository propertiesRepository)
 		{
 			this.rightmoveHttpClient = rightmoveHttpClient;
+			this.propertiesRepository = propertiesRepository;
 		}
 		public async Task Download(string locationIdentifier, decimal radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice)
 		{
@@ -18,8 +20,7 @@ namespace RightmoveDownloader.Services
 
 			await foreach (var property in properties)
 			{
-				Console.WriteLine(property.price + "\t" + property.propertyUrl);
-
+				propertiesRepository.AddProperty(property);
 			}
 
 		}

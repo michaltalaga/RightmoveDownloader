@@ -29,6 +29,7 @@ namespace RightmoveDownloader
 			}));
 
 			services.AddTransient<IRightmoveDownloadService, RightmoveDownloadService>();
+			services.AddTransient<IPropertyRepository, InMemoryPropertyRepository>();
 			services.AddHangfire(config =>
 			{
 				config.UseMemoryStorage();
