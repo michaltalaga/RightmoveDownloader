@@ -1,7 +1,7 @@
-﻿{
+{
   "iisSettings": {
-    "windowsAuthentication": false, 
-    "anonymousAuthentication": true, 
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
     "iisExpress": {
       "applicationUrl": "http://localhost:37005",
       "sslPort": 44327
@@ -18,10 +18,14 @@
     "RightmoveDownloader": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "launchUrl": "hangfire",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "GoogleAppName": "",
+        "GoogleApiKey": "",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "GoogleSpreadsheetId": ""
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
     }
   }
 }
