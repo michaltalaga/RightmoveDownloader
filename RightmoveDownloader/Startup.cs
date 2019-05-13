@@ -15,31 +15,32 @@ using RightmoveDownloader.Services;
 
 namespace RightmoveDownloader
 {
-    public class Startup
-    {
+	public class Startup
+	{
 		// This method gets called by the runtime. Use this method to add services to the container.
 		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
-        {
-			services.AddHttpClient("test", x=> { }).AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
+		{
+			services.AddHttpClient<IRightmoveHttpClient, RightmoveHttpClient>().AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
 			{
 				TimeSpan.FromSeconds(1),
 				TimeSpan.FromSeconds(5),
 				TimeSpan.FromSeconds(10)
 			}));
+
 			services.AddTransient<IRightmoveDownloadService, RightmoveDownloadService>();
 			services.AddHangfire(config =>
 			{
 				config.UseMemoryStorage();
 			});
-        }
+		}
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IRecurringJobManager recurringJobManager)
-        {
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IRecurringJobManager recurringJobManager)
+		{
 			app.UseHangfireDashboard();
 			app.UseHangfireServer();
-			recurringJobManager.AddOrUpdate("Download", Job.FromExpression<IRightmoveDownloadService>(service => service.Download("CR0 6EF", 20, 2, 3, 1400, 1800)), Cron.Yearly(2, 31));
+			recurringJobManager.AddOrUpdate("Download", Job.FromExpression<IRightmoveDownloadService>(service => service.Download("POSTCODE%5E1274909", 20, 2, 3, 1400, 1800)), Cron.Yearly(2, 31));
 
 		}
 	}
