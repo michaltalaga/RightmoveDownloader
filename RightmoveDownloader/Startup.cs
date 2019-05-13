@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Google.Apis.Sheets.v4;
 using Hangfire;
 using Hangfire.Common;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Polly;
@@ -17,6 +20,12 @@ namespace RightmoveDownloader
 {
 	public class Startup
 	{
+		private readonly IConfiguration configuration;
+
+		public Startup(IConfiguration configuration)
+		{
+			this.configuration = configuration;
+		}
 		// This method gets called by the runtime. Use this method to add services to the container.
 		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
@@ -27,9 +36,9 @@ namespace RightmoveDownloader
 				TimeSpan.FromSeconds(5),
 				TimeSpan.FromSeconds(10)
 			}));
-
+			services.AddSingleton<IGoogleSheetsService>(new GoogleSheetsService(File.ReadAllText("google-service-account.json"), configuration.GetValue<string>("GoogleAppName"), configuration.GetValue<string>("GoogleSpreadsheetId")));
 			services.AddTransient<IRightmoveDownloadService, RightmoveDownloadService>();
-			services.AddTransient<IPropertyRepository, InMemoryPropertyRepository>();
+			services.AddTransient<IPropertyRepository, GoogleSheetsPropertyRespository>();
 			services.AddHangfire(config =>
 			{
 				config.UseMemoryStorage();
@@ -41,8 +50,7 @@ namespace RightmoveDownloader
 		{
 			app.UseHangfireDashboard();
 			app.UseHangfireServer();
-			recurringJobManager.AddOrUpdate("Download", Job.FromExpression<IRightmoveDownloadService>(service => service.Download("POSTCODE%5E1274909", 20, 2, 3, 1400, 1800)), Cron.Yearly(2, 31));
-
+			recurringJobManager.AddOrUpdate("Download", Job.FromExpression<IRightmoveDownloadService>(service => service.Download("POSTCODE%5E1274909", 20, 2, 3, 1400, 1450)), Cron.Yearly(2, 31));
 		}
 	}
 }

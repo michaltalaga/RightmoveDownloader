@@ -21,6 +21,11 @@ namespace RightmoveDownloader
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
 					webBuilder.UseStartup<Startup>();
-				});
+				})
+				.ConfigureAppConfiguration(builder =>
+				{
+					builder.AddEnvironmentVariables();
+				})
+			;
     }
 }
