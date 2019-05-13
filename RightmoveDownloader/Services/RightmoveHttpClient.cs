@@ -28,6 +28,7 @@ namespace RightmoveDownloader.Services
 					var result = await response.Content.ReadAsAsync<SearchResult>();
 					foreach (var property in result.properties.Where(p => p.featuredProperty == false))
 					{
+						property.propertyUrl = new Uri(new Uri("https://www.rightmove.co.uk/"), property.propertyUrl).ToString();
 						yield return property;
 					}
 					if (result.pagination.next == null) break;
