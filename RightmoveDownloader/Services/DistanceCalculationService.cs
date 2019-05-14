@@ -11,10 +11,12 @@ namespace RightmoveDownloader.Services
 	{
 		private readonly IGoogleSheetsClient googleSheetsClient;
 		private readonly IPropertyRepository propertyRepository;
+		private readonly IGoogleMapsDistanceApiClient googleMapsDistanceApiClient;
 
-		public DistanceCalculationService(IPropertyRepository propertyRepository)
+		public DistanceCalculationService(IPropertyRepository propertyRepository, IGoogleMapsDistanceApiClient googleMapsDistanceApiClient)
 		{
 			this.propertyRepository = propertyRepository;
+			this.googleMapsDistanceApiClient = googleMapsDistanceApiClient;
 		}
 		public async Task Process()
 		{

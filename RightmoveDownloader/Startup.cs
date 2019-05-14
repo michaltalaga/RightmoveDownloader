@@ -42,6 +42,7 @@ namespace RightmoveDownloader
 			services.AddTransient<IRightmoveDownloadService, RightmoveDownloadService>();
 			services.AddTransient<IDistanceCalculationService, DistanceCalculationService>();
 			services.AddTransient<IPropertyRepository, GoogleSheetsPropertyRespository>();
+			services.AddTransient<IGoogleMapsDistanceApiClient, GoogleMapsDistanceApiClient>();
 			services.AddHangfire(config =>
 			{
 				config.UseMemoryStorage();
