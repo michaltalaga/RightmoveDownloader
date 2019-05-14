@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Linq;
 using RightmoveDownloader.Clients;
+using RightmoveDownloader.Repositories;
 
 namespace RightmoveDownloader.Services
 {

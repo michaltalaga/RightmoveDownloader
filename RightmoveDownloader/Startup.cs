@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Polly;
 using RightmoveDownloader.Clients;
+using RightmoveDownloader.Repositories;
 using RightmoveDownloader.Services;
 
 namespace RightmoveDownloader

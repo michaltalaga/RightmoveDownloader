@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RightmoveDownloader.Services
+namespace RightmoveDownloader.Repositories
 {
 	public class GoogleSheetsPropertyRespository : IPropertyRepository
 	{
@@ -21,7 +21,7 @@ namespace RightmoveDownloader.Services
 		}
 		public void AddProperties(IEnumerable<RightmoveHttpClient.Property> properties)
 		{
-			String range = "properties!A1:Y";
+			string range = "properties!A1:Y";
 			var response = googleSheetsService.Get(range);
 			var newData = new ValueRange();
 			newData.Values = response.Values ?? new List<IList<object>>();
