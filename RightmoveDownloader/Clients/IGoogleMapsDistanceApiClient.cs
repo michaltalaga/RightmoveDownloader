@@ -1,7 +1,9 @@
-﻿namespace RightmoveDownloader.Clients
+﻿using System.Threading.Tasks;
+
+namespace RightmoveDownloader.Clients
 {
 	public interface IGoogleMapsDistanceApiClient
 	{
-		int GetMinutesBetweenPoints(string fromLocation, string toLocation);
+		Task<int> GetMinutesBetweenPoints(string fromLocation, string toLocation);
 	}
 }

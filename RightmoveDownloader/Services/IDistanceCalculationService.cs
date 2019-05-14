@@ -4,6 +4,6 @@ namespace RightmoveDownloader.Services
 {
 	public interface IDistanceCalculationService
 	{
-		Task Process();
+		Task FindDistances(string toLocation);
 	}
 }

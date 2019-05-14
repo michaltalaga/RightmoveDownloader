@@ -39,6 +39,7 @@ namespace RightmoveDownloader
 				TimeSpan.FromSeconds(10)
 			}));
 			services.AddSingleton<IGoogleSheetsClient>(new GoogleSheetsClient(File.ReadAllText("google-service-account.json"), configuration.GetValue<string>("GoogleAppName"), configuration.GetValue<string>("GoogleSpreadsheetId")));
+			services.AddSingleton<IGoogleMapsDistanceApiClient>(new GoogleMapsDistanceApiClient(configuration.GetValue<string>("GoogleMapsApiKey")));
 			services.AddTransient<IRightmoveDownloadService, RightmoveDownloadService>();
 			services.AddTransient<IDistanceCalculationService, DistanceCalculationService>();
 			services.AddTransient<IPropertyRepository, GoogleSheetsPropertyRespository>();
@@ -55,7 +56,7 @@ namespace RightmoveDownloader
 			app.UseHangfireDashboard();
 			app.UseHangfireServer();
 			recurringJobManager.AddOrUpdate("Download", Job.FromExpression<IRightmoveDownloadService>(service => service.Download(configuration.GetValue<string>("locationIdentifier"), configuration.GetValue<decimal>("radius"), configuration.GetValue<int>("minBedrooms"), configuration.GetValue<int>("maxBedrooms"), configuration.GetValue<int>("minPrice"), configuration.GetValue<int>("maxPrice"))), Cron.Yearly(2, 31));
-			recurringJobManager.AddOrUpdate("Calculate Distances", Job.FromExpression<IDistanceCalculationService>(service => service.Process()), Cron.Yearly(2, 31));
+			recurringJobManager.AddOrUpdate("Calculate Distances", Job.FromExpression<IDistanceCalculationService>(service => service.FindDistances("51.5165114,-0.1239118")), Cron.Yearly(2, 31));
 		}
 	}
 }

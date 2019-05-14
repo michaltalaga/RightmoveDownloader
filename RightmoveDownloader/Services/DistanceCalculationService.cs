@@ -18,7 +18,7 @@ namespace RightmoveDownloader.Services
 			this.propertyRepository = propertyRepository;
 			this.googleMapsDistanceApiClient = googleMapsDistanceApiClient;
 		}
-		public async Task Process()
+		public async Task FindDistances(string toLocation)
 		{
 			var locations = propertyRepository.GetLocations(false).ToList();
 		}

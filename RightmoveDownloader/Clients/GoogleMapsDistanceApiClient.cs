@@ -1,15 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RightmoveDownloader.Clients
 {
 	public class GoogleMapsDistanceApiClient : IGoogleMapsDistanceApiClient
 	{
-		public int GetMinutesBetweenPoints(string fromLocation, string toLocation)
+		private readonly string apiKey;
+
+		public GoogleMapsDistanceApiClient(string apiKey)
 		{
+			this.apiKey = apiKey;
+		}
+		public async Task<int> GetMinutesBetweenPoints(string fromLocation, string toLocation)
+		{
+			var firstWorkingMonday = StartOfWeek(DateTime.Now.AddDays(7), DayOfWeek.Monday).Date.AddHours(8);
+			var timestamp = (Int32)(firstWorkingMonday.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+			var url = $"https://maps.googleapis.com/maps/api/directions/json?mode=transit&arrival_time={timestamp}&origin={fromLocation}&destination={toLocation}&key=" + apiKey;
+
+			var client = new HttpClient();
+			while (true)
+			{
+				//OVER_QUERY_LIMIT
+			
+				var response = await client.GetAsync(url);
+				var result = await response.Content.ReadAsAsync<GoogleapisResult>();
+				if (result.status == "OVER_QUERY_LIMIT")
+				{
+					Thread.Sleep(1000);
+
+					continue;
+				}
+				else if (result.status == "ZERO_RESULTS")
+				{
+					return int.MaxValue;
+				}
+				try
+				{
+					return (int)Math.Ceiling((decimal)result.routes[0].legs[0].duration.value / 60m);
+				}
+				catch (Exception ex)
+				{
+					throw;
+				}
+			}
 			return 0;
+		}
+		DateTime StartOfWeek(DateTime startDate, DayOfWeek startOfWeek)
+		{
+			int diff = (7 + (startDate.DayOfWeek - startOfWeek)) % 7;
+			return startDate.AddDays(-1 * diff).Date;
 		}
 		class GoogleapisResult
 		{
