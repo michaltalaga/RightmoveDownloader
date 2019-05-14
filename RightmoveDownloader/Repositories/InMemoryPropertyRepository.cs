@@ -17,5 +17,9 @@ namespace RightmoveDownloader.Repositories
 				this.properties[property.id] = property;
 			}
 		}
+		public IEnumerable<string> GetLocations(bool includeCalculated = false)
+		{
+			return properties.Select(x => x.Value.location.latitude + "," + x.Value.location.longitude).Distinct();
+		}
 	}
 }

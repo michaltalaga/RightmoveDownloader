@@ -14,18 +14,18 @@ namespace RightmoveDownloader.Repositories
 	public class GoogleSheetsPropertyRespository : IPropertyRepository
 	{
 		private readonly IGoogleSheetsClient googleSheetsService;
-
+		const string propertiesRange = "properties!A:J";
 		public GoogleSheetsPropertyRespository(IGoogleSheetsClient googleSheetsService)
 		{
 			this.googleSheetsService = googleSheetsService;
 		}
 		public void AddProperties(IEnumerable<RightmoveHttpClient.Property> properties)
 		{
-			string range = "properties!A1:Y";
-			var response = googleSheetsService.Get(range);
+			var response = googleSheetsService.Get(propertiesRange);
 			var newData = new ValueRange();
 			newData.Values = response.Values ?? new List<IList<object>>();
 			var firstRow = newData.Values[0];
+			int row = 2;
 			foreach (var property in properties)
 			{
 				var existingEntry = newData.Values.SingleOrDefault(v => (string)v[0] == property.id);
@@ -37,14 +37,21 @@ namespace RightmoveDownloader.Repositories
 				}
 				existingEntry[0] = property.id;
 				existingEntry[1] = DateTime.Now;
-				//status
+				//2 status
 				existingEntry[3] = property.price.frequency == "monthly" ? property.price.amount : property.price.amount * 4;
 				existingEntry[4] = property.bedrooms;
 				existingEntry[5] = property.numberOfFloorplans;
 				existingEntry[6] = property.location.latitude + "," + property.location.longitude;
 				existingEntry[7] = property.propertyUrl;
+				existingEntry[8] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),distances!A:C,2,FALSE),-1)";
+				row++;
 			}
-			googleSheetsService.Update(newData, range);
+			googleSheetsService.Update(newData, propertiesRange);
+		}
+		public IEnumerable<string> GetLocations(bool includeCalculated = false)
+		{
+			var response = googleSheetsService.Get(propertiesRange);
+			return response.Values.Skip(1).Where(v => includeCalculated || (Convert.ToInt32(v[8]) == -1)).Select(v => (string)v[6]).Distinct().ToArray();
 		}
 	}
 }
