@@ -21,6 +21,11 @@ namespace RightmoveDownloader.Services
 		public async Task FindDistances(string toLocation)
 		{
 			var locations = propertyRepository.GetLocations(false).ToList();
+            foreach (var location in locations)
+            {
+                var minutes = await googleMapsDistanceApiClient.GetMinutesBetweenPoints(location, toLocation);
+                //propertyRepository.AddDistance()
+            }
 		}
 	}
 }

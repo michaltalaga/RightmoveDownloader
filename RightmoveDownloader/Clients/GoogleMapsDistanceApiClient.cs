@@ -10,18 +10,20 @@ namespace RightmoveDownloader.Clients
 	public class GoogleMapsDistanceApiClient : IGoogleMapsDistanceApiClient
 	{
 		private readonly string apiKey;
+        private readonly IHttpClientFactory httpClientFactory;
 
-		public GoogleMapsDistanceApiClient(string apiKey)
+        public GoogleMapsDistanceApiClient(string apiKey, IHttpClientFactory httpClientFactory)
 		{
 			this.apiKey = apiKey;
-		}
+            this.httpClientFactory = httpClientFactory;
+        }
 		public async Task<int> GetMinutesBetweenPoints(string fromLocation, string toLocation)
 		{
 			var firstWorkingMonday = StartOfWeek(DateTime.Now.AddDays(7), DayOfWeek.Monday).Date.AddHours(8);
 			var timestamp = (Int32)(firstWorkingMonday.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 			var url = $"https://maps.googleapis.com/maps/api/directions/json?mode=transit&arrival_time={timestamp}&origin={fromLocation}&destination={toLocation}&key=" + apiKey;
 
-			var client = new HttpClient();
+            var client = httpClientFactory.CreateClient();
 			while (true)
 			{
 				//OVER_QUERY_LIMIT

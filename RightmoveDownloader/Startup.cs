@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Google.Apis.Sheets.v4;
 using Hangfire;
@@ -39,11 +40,10 @@ namespace RightmoveDownloader
 				TimeSpan.FromSeconds(10)
 			}));
 			services.AddSingleton<IGoogleSheetsClient>(new GoogleSheetsClient(File.ReadAllText("google-service-account.json"), configuration.GetValue<string>("GoogleAppName"), configuration.GetValue<string>("GoogleSpreadsheetId")));
-			services.AddSingleton<IGoogleMapsDistanceApiClient>(new GoogleMapsDistanceApiClient(configuration.GetValue<string>("GoogleMapsApiKey")));
+			services.AddSingleton<IGoogleMapsDistanceApiClient>(s=>new GoogleMapsDistanceApiClient(configuration.GetValue<string>("GoogleMapsApiKey"), s.GetService<IHttpClientFactory>()));
 			services.AddTransient<IRightmoveDownloadService, RightmoveDownloadService>();
 			services.AddTransient<IDistanceCalculationService, DistanceCalculationService>();
 			services.AddTransient<IPropertyRepository, GoogleSheetsPropertyRespository>();
-			services.AddTransient<IGoogleMapsDistanceApiClient, GoogleMapsDistanceApiClient>();
 			services.AddHangfire(config =>
 			{
 				config.UseMemoryStorage();
