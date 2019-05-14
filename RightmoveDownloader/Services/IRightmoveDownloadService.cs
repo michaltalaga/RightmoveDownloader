@@ -7,6 +7,6 @@ namespace RightmoveDownloader.Services
 {
 	public interface IRightmoveDownloadService
 	{
-		Task Download(string postcode, decimal radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice);
+		Task Download(string locationIdentifier, decimal radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice);
 	}
 }

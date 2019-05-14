@@ -50,7 +50,7 @@ namespace RightmoveDownloader
 		{
 			app.UseHangfireDashboard();
 			app.UseHangfireServer();
-			recurringJobManager.AddOrUpdate("Download", Job.FromExpression<IRightmoveDownloadService>(service => service.Download("POSTCODE%5E1274909", 20, 2, 3, 1400, 1450)), Cron.Yearly(2, 31));
+			recurringJobManager.AddOrUpdate("Download", Job.FromExpression<IRightmoveDownloadService>(service => service.Download(configuration.GetValue<string>("locationIdenfitier"), configuration.GetValue<decimal>("radius"), configuration.GetValue<int>("minBedrooms"), configuration.GetValue<int>("maxBedrooms"), configuration.GetValue<int>("minPrice"), configuration.GetValue<int>("maxPrice"))), Cron.Yearly(2, 31));
 		}
 	}
 }
