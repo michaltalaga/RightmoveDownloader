@@ -9,9 +9,12 @@ namespace RightmoveDownloader.Services
 	public class InMemoryPropertyRepository : IPropertyRepository
 	{
 		ConcurrentDictionary<string, RightmoveHttpClient.Property> properties = new ConcurrentDictionary<string, RightmoveHttpClient.Property>();
-		public void AddProperty(RightmoveHttpClient.Property property)
+		public void AddProperties(IEnumerable<RightmoveHttpClient.Property> properties)
 		{
-			properties[property.id] = property;
+			foreach (var property in properties)
+			{
+				this.properties[property.id] = property;
+			}
 		}
 	}
 }

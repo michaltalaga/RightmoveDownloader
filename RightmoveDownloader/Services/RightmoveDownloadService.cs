@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace RightmoveDownloader.Services
 {
@@ -16,11 +17,11 @@ namespace RightmoveDownloader.Services
 		}
 		public async Task Download(string locationIdentifier, decimal radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice)
 		{
-			var properties = rightmoveHttpClient.GetProperties(locationIdentifier, radius, minBedrooms, maxBedrooms, minPrice, maxPrice);
-
-			await foreach (var property in properties)
+			var propertyBatches = rightmoveHttpClient.GetProperties(locationIdentifier, radius, minBedrooms, maxBedrooms, minPrice, maxPrice);
+			
+			await foreach (var properties in propertyBatches)
 			{
-				propertiesRepository.AddProperty(property);
+				propertiesRepository.AddProperties(properties);
 			}
 
 		}

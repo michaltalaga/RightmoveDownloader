@@ -15,7 +15,7 @@ namespace RightmoveDownloader.Services
 			httpClient.DefaultRequestHeaders.Add("User-Agent", "C# App");
 			this.httpClient = httpClient;
 		}
-		public async IAsyncEnumerable<Property> GetProperties(string locationIdentifier, decimal radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice)
+		public async IAsyncEnumerable<IEnumerable<Property>> GetProperties(string locationIdentifier, decimal radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice)
 		{
 			const int priceStep = 10;
 			for (int i = minPrice; i <= maxPrice; i += priceStep)
@@ -26,11 +26,11 @@ namespace RightmoveDownloader.Services
 				{
 					var response = await httpClient.GetAsync(url + pageIndex);
 					var result = await response.Content.ReadAsAsync<SearchResult>();
-					foreach (var property in result.properties.Where(p => p.featuredProperty == false))
+					yield return result.properties.Where(p => p.featuredProperty == false).Select(p =>
 					{
-						property.propertyUrl = new Uri(new Uri("https://www.rightmove.co.uk/"), property.propertyUrl).ToString();
-						yield return property;
-					}
+						p.propertyUrl = new Uri(new Uri("https://www.rightmove.co.uk/"), p.propertyUrl).ToString();
+						return p;
+					});
 					if (result.pagination.next == null) break;
 					pageIndex = result.pagination.next.Value;
 				}

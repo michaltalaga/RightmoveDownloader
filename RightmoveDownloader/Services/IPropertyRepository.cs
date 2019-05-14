@@ -7,6 +7,6 @@ namespace RightmoveDownloader.Services
 {
 	public interface IPropertyRepository
 	{
-		void AddProperty(RightmoveHttpClient.Property property);
+		void AddProperties(IEnumerable<RightmoveHttpClient.Property> properties);
 	}
 }
