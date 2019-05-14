@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace RightmoveDownloader.Services
+namespace RightmoveDownloader.Clients
 {
 	public interface IRightmoveHttpClient
 	{

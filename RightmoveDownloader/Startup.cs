@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Polly;
+using RightmoveDownloader.Clients;
 using RightmoveDownloader.Services;
 
 namespace RightmoveDownloader
@@ -36,7 +37,7 @@ namespace RightmoveDownloader
 				TimeSpan.FromSeconds(5),
 				TimeSpan.FromSeconds(10)
 			}));
-			services.AddSingleton<IGoogleSheetsService>(new GoogleSheetsService(File.ReadAllText("google-service-account.json"), configuration.GetValue<string>("GoogleAppName"), configuration.GetValue<string>("GoogleSpreadsheetId")));
+			services.AddSingleton<IGoogleSheetsClient>(new GoogleSheetsClient(File.ReadAllText("google-service-account.json"), configuration.GetValue<string>("GoogleAppName"), configuration.GetValue<string>("GoogleSpreadsheetId")));
 			services.AddTransient<IRightmoveDownloadService, RightmoveDownloadService>();
 			services.AddTransient<IPropertyRepository, GoogleSheetsPropertyRespository>();
 			services.AddHangfire(config =>

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 
-namespace RightmoveDownloader.Services
+namespace RightmoveDownloader.Clients
 {
 	public class RightmoveHttpClient : IRightmoveHttpClient
 	{

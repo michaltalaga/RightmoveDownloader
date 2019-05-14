@@ -2,6 +2,7 @@
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
+using RightmoveDownloader.Clients;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,9 +13,9 @@ namespace RightmoveDownloader.Services
 {
 	public class GoogleSheetsPropertyRespository : IPropertyRepository
 	{
-		private readonly IGoogleSheetsService googleSheetsService;
+		private readonly IGoogleSheetsClient googleSheetsService;
 
-		public GoogleSheetsPropertyRespository(IGoogleSheetsService googleSheetsService)
+		public GoogleSheetsPropertyRespository(IGoogleSheetsClient googleSheetsService)
 		{
 			this.googleSheetsService = googleSheetsService;
 		}

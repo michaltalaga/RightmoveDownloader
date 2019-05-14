@@ -8,14 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RightmoveDownloader.Services
+namespace RightmoveDownloader.Clients
 {
-	public class GoogleSheetsService : IGoogleSheetsService
+	public class GoogleSheetsClient : IGoogleSheetsClient
 	{
 		private readonly string spreadsheetId;
 		SheetsService sheetsService;
 
-		public GoogleSheetsService(string credentialJson, string applicationName, string spreadsheetId)
+		public GoogleSheetsClient(string credentialJson, string applicationName, string spreadsheetId)
 		{
 			var credential = GoogleCredential.FromJson(credentialJson).CreateScoped(new[] { SheetsService.Scope.Spreadsheets });
 			sheetsService = new SheetsService(new BaseClientService.Initializer() { HttpClientInitializer = credential, ApplicationName = applicationName });
