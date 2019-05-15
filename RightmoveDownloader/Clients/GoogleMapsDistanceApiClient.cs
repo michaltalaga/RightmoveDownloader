@@ -10,46 +10,44 @@ namespace RightmoveDownloader.Clients
 	public class GoogleMapsDistanceApiClient : IGoogleMapsDistanceApiClient
 	{
 		private readonly string apiKey;
-        private readonly IHttpClientFactory httpClientFactory;
+		private readonly IHttpClientFactory httpClientFactory;
 
-        public GoogleMapsDistanceApiClient(string apiKey, IHttpClientFactory httpClientFactory)
+		public GoogleMapsDistanceApiClient(string apiKey, IHttpClientFactory httpClientFactory)
 		{
 			this.apiKey = apiKey;
-            this.httpClientFactory = httpClientFactory;
-        }
-		public async Task<int> GetMinutesBetweenPoints(string fromLocation, string toLocation)
+			this.httpClientFactory = httpClientFactory;
+		}
+		public async Task<IGoogleMapsDistanceApiClient.TravelTime> GetTravelTime(string fromLocation, string toLocation)
 		{
 			var firstWorkingMonday = StartOfWeek(DateTime.Now.AddDays(7), DayOfWeek.Monday).Date.AddHours(8);
-			var timestamp = (Int32)(firstWorkingMonday.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+			var timestamp1 = (Int32)(firstWorkingMonday.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+			var timestamp2 = (Int32)(firstWorkingMonday.AddMinutes(15).Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+			var minutes = Math.Min(await GetMinutesBetweenPoints(fromLocation, toLocation, timestamp1), await GetMinutesBetweenPoints(fromLocation, toLocation, timestamp2));
+			return new IGoogleMapsDistanceApiClient.TravelTime { From = fromLocation, To = toLocation, Minutes = minutes };
+		}
+
+		private async Task<int> GetMinutesBetweenPoints(string fromLocation, string toLocation, int timestamp)
+		{
 			var url = $"https://maps.googleapis.com/maps/api/directions/json?mode=transit&arrival_time={timestamp}&origin={fromLocation}&destination={toLocation}&key=" + apiKey;
 
-            var client = httpClientFactory.CreateClient();
+			var client = httpClientFactory.CreateClient();
 			while (true)
 			{
-				//OVER_QUERY_LIMIT
-			
 				var response = await client.GetAsync(url);
 				var result = await response.Content.ReadAsAsync<GoogleapisResult>();
 				if (result.status == "OVER_QUERY_LIMIT")
 				{
 					Thread.Sleep(1000);
-
 					continue;
 				}
 				else if (result.status == "ZERO_RESULTS")
 				{
-					return int.MaxValue;
+					return  int.MaxValue ;
 				}
-				try
-				{
-					return (int)Math.Ceiling((decimal)result.routes[0].legs[0].duration.value / 60m);
-				}
-				catch (Exception ex)
-				{
-					throw;
-				}
+				return  (int)Math.Ceiling((decimal)result.routes[0].legs[0].duration.value / 60m);
 			}
 		}
+
 		DateTime StartOfWeek(DateTime startDate, DayOfWeek startOfWeek)
 		{
 			int diff = (7 + (startDate.DayOfWeek - startOfWeek)) % 7;

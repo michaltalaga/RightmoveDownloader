@@ -15,6 +15,7 @@ namespace RightmoveDownloader.Repositories
 	{
 		private readonly IGoogleSheetsClient googleSheetsService;
 		const string propertiesRange = "properties!A:J";
+		const string travelTimesRange = "times!A:C";
 		public GoogleSheetsPropertyRespository(IGoogleSheetsClient googleSheetsService)
 		{
 			this.googleSheetsService = googleSheetsService;
@@ -43,7 +44,7 @@ namespace RightmoveDownloader.Repositories
 				existingEntry[5] = property.numberOfFloorplans;
 				existingEntry[6] = property.location.latitude + "," + property.location.longitude;
 				existingEntry[7] = property.propertyUrl;
-				existingEntry[8] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),distances!A:C,2,FALSE),-1)";
+				existingEntry[8] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:C,2,FALSE),-1)";
 				row++;
 			}
 			await googleSheetsService.Update(newData, propertiesRange);
@@ -52,6 +53,24 @@ namespace RightmoveDownloader.Repositories
 		{
 			var response = await googleSheetsService.Get(propertiesRange);
 			return response.Values.Skip(1).Where(v => includeCalculated || (Convert.ToInt32(v[8]) == -1)).Select(v => (string)v[6]).Distinct().ToArray();
+		}
+
+		public async Task AddTravelTimes(IEnumerable<IGoogleMapsDistanceApiClient.TravelTime> travelTimes)
+		{
+			var newData = new ValueRange
+			{
+				Values = new List<IList<object>>()
+			};
+			foreach (var travelTime in travelTimes)
+			{
+				newData.Values.Add(new List<object>
+				{
+					travelTime.From,
+					travelTime.Minutes,
+					null
+				});
+			}
+			await googleSheetsService.Append(newData, travelTimesRange);
 		}
 	}
 }

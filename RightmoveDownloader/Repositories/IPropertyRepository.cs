@@ -10,6 +10,6 @@ namespace RightmoveDownloader.Repositories
 	{
 		Task AddProperties(IEnumerable<RightmoveHttpClient.Property> properties);
 		Task<IEnumerable<string>> GetLocations(bool includeCalculated = false);
-
+		Task AddTravelTimes(IEnumerable<IGoogleMapsDistanceApiClient.TravelTime> travelTimes);
 	}
 }

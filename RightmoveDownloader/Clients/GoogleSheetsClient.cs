@@ -33,5 +33,11 @@ namespace RightmoveDownloader.Clients
 			updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
 			return updateRequest.ExecuteAsync();
 		}
+		public Task<AppendValuesResponse> Append(ValueRange body, string range)
+		{
+			var request = sheetsService.Spreadsheets.Values.Append(body, spreadsheetId, range);
+			request.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+			return request.ExecuteAsync();
+		}
 	}
 }

@@ -1,4 +1,6 @@
-﻿using RightmoveDownloader.Clients;
+﻿using MoreLinq;
+using MoreLinq.Experimental;
+using RightmoveDownloader.Clients;
 using RightmoveDownloader.Repositories;
 using System;
 using System.Collections.Generic;
@@ -9,7 +11,6 @@ namespace RightmoveDownloader.Services
 {
 	public class DistanceCalculationService : IDistanceCalculationService
 	{
-		private readonly IGoogleSheetsClient googleSheetsClient;
 		private readonly IPropertyRepository propertyRepository;
 		private readonly IGoogleMapsDistanceApiClient googleMapsDistanceApiClient;
 
@@ -21,11 +22,11 @@ namespace RightmoveDownloader.Services
 		public async Task FindDistances(string toLocation)
 		{
 			var locations = await propertyRepository.GetLocations(false);
-            foreach (var location in locations)
+            foreach (var locationsBatch in locations.Batch(10))
             {
-                var minutes = await googleMapsDistanceApiClient.GetMinutesBetweenPoints(location, toLocation);
-                //propertyRepository.AddDistance()
-            }
+				var travelTimes = await Task.WhenAll(locationsBatch.Select(location => googleMapsDistanceApiClient.GetTravelTime(location, toLocation)));
+				await propertyRepository.AddTravelTimes(travelTimes);
+			}
 		}
 	}
 }

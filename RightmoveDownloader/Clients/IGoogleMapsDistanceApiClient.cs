@@ -4,6 +4,12 @@ namespace RightmoveDownloader.Clients
 {
 	public interface IGoogleMapsDistanceApiClient
 	{
-		Task<int> GetMinutesBetweenPoints(string fromLocation, string toLocation);
+		Task<TravelTime> GetTravelTime(string fromLocation, string toLocation);
+		public class TravelTime
+		{
+			public string From { get; set; }
+			public string To { get; set; }
+			public int Minutes { get; set; }
+		}
 	}
 }
