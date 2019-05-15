@@ -22,16 +22,16 @@ namespace RightmoveDownloader.Clients
 			this.spreadsheetId = spreadsheetId;
 		}
 
-		public async Task<ValueRange> Get(string range)
+		public Task<ValueRange> Get(string range)
 		{
 			var getRequest = sheetsService.Spreadsheets.Values.Get(spreadsheetId, range);
-			return await getRequest.ExecuteAsync();
+			return getRequest.ExecuteAsync();
 		}
-		public async Task<UpdateValuesResponse> Update(ValueRange body, string range)
+		public Task<UpdateValuesResponse> Update(ValueRange body, string range)
 		{
 			var updateRequest = sheetsService.Spreadsheets.Values.Update(body, spreadsheetId, range);
 			updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
-			return await updateRequest.ExecuteAsync();
+			return updateRequest.ExecuteAsync();
 		}
 	}
 }
