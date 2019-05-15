@@ -17,13 +17,13 @@ namespace RightmoveDownloader.Clients
 			this.httpClient = httpClient;
 			this.logger = logger;
 		}
-		public async IAsyncEnumerable<IEnumerable<Property>> GetProperties(string locationIdentifier, decimal radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice)
+		public async IAsyncEnumerable<IEnumerable<Property>> GetProperties(string locationIdentifier, int radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice)
 		{
 			logger.LogInformation($"GetProperties({locationIdentifier}, {radius}, {minBedrooms}, {maxBedrooms}, {minPrice}, {maxPrice})");
 			const int priceStep = 10;
 			for (int i = minPrice; i <= maxPrice; i += priceStep)
 			{
-				string url = $"http://www.rightmove.co.uk/api/_search?locationIdentifier={locationIdentifier}&minBedrooms={minBedrooms}&minPrice={i}&maxPrice={i + priceStep}&numberOfPropertiesPerPage=48&radius={radius}&sortType=6&includeLetAgreed=false&viewType=LIST&dontShow=retirement%2ChouseShare&channel=RENT&areaSizeUnit=sqm&currencyCode=GBP&isFetching=false&index=";
+				string url = $"https://www.rightmove.co.uk/api/_search?locationIdentifier={locationIdentifier}&minBedrooms={minBedrooms}&minPrice={i}&maxPrice={i + priceStep}&numberOfPropertiesPerPage=48&radius={radius}&sortType=6&includeLetAgreed=false&viewType=LIST&dontShow=retirement%2ChouseShare&channel=RENT&areaSizeUnit=sqm&currencyCode=GBP&isFetching=false&index=";
 				var pageIndex = 0;
 				while (true)
 				{

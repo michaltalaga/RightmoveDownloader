@@ -20,7 +20,7 @@ namespace RightmoveDownloader.Services
 			this.propertiesRepository = propertiesRepository;
 			this.logger = logger;
 		}
-		public async Task Download(string locationIdentifier, decimal radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice)
+		public async Task Download(string locationIdentifier, int radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice)
 		{
 			logger.LogInformation($"Download({locationIdentifier}, {radius}, {minBedrooms}, {maxBedrooms}, {minPrice}, {maxPrice})");
 			var propertyBatches = rightmoveHttpClient.GetProperties(locationIdentifier, radius, minBedrooms, maxBedrooms, minPrice, maxPrice);
