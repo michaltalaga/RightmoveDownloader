@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -11,18 +12,22 @@ namespace RightmoveDownloader.Clients
 	{
 		private readonly string apiKey;
 		private readonly IHttpClientFactory httpClientFactory;
+		private readonly ILogger<GoogleMapsDistanceApiClient> logger;
 
-		public GoogleMapsDistanceApiClient(string apiKey, IHttpClientFactory httpClientFactory)
+		public GoogleMapsDistanceApiClient(string apiKey, IHttpClientFactory httpClientFactory, ILogger<GoogleMapsDistanceApiClient> logger)
 		{
 			this.apiKey = apiKey;
 			this.httpClientFactory = httpClientFactory;
+			this.logger = logger;
 		}
 		public async Task<IGoogleMapsDistanceApiClient.TravelTime> GetTravelTime(string fromLocation, string toLocation)
 		{
+			logger.LogInformation($"GetTravelTime({fromLocation}, {toLocation})");
 			var firstWorkingMonday = StartOfWeek(DateTime.Now.AddDays(7), DayOfWeek.Monday).Date.AddHours(8);
 			var timestamp1 = (Int32)(firstWorkingMonday.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 			var timestamp2 = (Int32)(firstWorkingMonday.AddMinutes(15).Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 			var minutes = Math.Min(await GetMinutesBetweenPoints(fromLocation, toLocation, timestamp1), await GetMinutesBetweenPoints(fromLocation, toLocation, timestamp2));
+			logger.LogInformation($"GetTravelTime({fromLocation}, {toLocation}) - {minutes}");
 			return new IGoogleMapsDistanceApiClient.TravelTime { From = fromLocation, To = toLocation, Minutes = minutes };
 		}
 
@@ -37,11 +42,13 @@ namespace RightmoveDownloader.Clients
 				var result = await response.Content.ReadAsAsync<GoogleapisResult>();
 				if (result.status == "OVER_QUERY_LIMIT")
 				{
+					logger.LogWarning($"GetMinutesBetweenPoints({fromLocation}, {toLocation}, {timestamp}) - OVER_QUERY_LIMIT");
 					Thread.Sleep(1000);
 					continue;
 				}
-				else if (result.status == "ZERO_RESULTS")
+				else if (result.status == "ZERO_RESULTS" || result.status == "NOT_FOUND")
 				{
+					logger.LogWarning($"GetMinutesBetweenPoints({fromLocation}, {toLocation}, {timestamp}) - {result.status}");
 					return  int.MaxValue ;
 				}
 				return  (int)Math.Ceiling((decimal)result.routes[0].legs[0].duration.value / 60m);

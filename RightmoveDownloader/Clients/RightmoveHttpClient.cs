@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,14 +10,16 @@ namespace RightmoveDownloader.Clients
 	public class RightmoveHttpClient : IRightmoveHttpClient
 	{
 		private readonly HttpClient httpClient;
+		private readonly ILogger<RightmoveHttpClient> logger;
 
-		public RightmoveHttpClient(HttpClient httpClient)
+		public RightmoveHttpClient(HttpClient httpClient, ILogger<RightmoveHttpClient> logger)
 		{
-			httpClient.DefaultRequestHeaders.Add("User-Agent", "C# App");
 			this.httpClient = httpClient;
+			this.logger = logger;
 		}
 		public async IAsyncEnumerable<IEnumerable<Property>> GetProperties(string locationIdentifier, decimal radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice)
 		{
+			logger.LogInformation($"GetProperties({locationIdentifier}, {radius}, {minBedrooms}, {maxBedrooms}, {minPrice}, {maxPrice})");
 			const int priceStep = 10;
 			for (int i = minPrice; i <= maxPrice; i += priceStep)
 			{
@@ -24,6 +27,7 @@ namespace RightmoveDownloader.Clients
 				var pageIndex = 0;
 				while (true)
 				{
+					logger.LogInformation($"GetAsync({url + pageIndex})");
 					var response = await httpClient.GetAsync(url + pageIndex);
 					var result = await response.Content.ReadAsAsync<SearchResult>();
 					yield return result.properties.Where(p => p.featuredProperty == false).Select(p =>
@@ -34,8 +38,8 @@ namespace RightmoveDownloader.Clients
 					if (result.pagination.next == null) break;
 					pageIndex = result.pagination.next.Value;
 				}
-
 			}
+			logger.LogInformation($"GetProperties({locationIdentifier}, {radius}, {minBedrooms}, {maxBedrooms}, {minPrice}, {maxPrice}) - DONE");
 		}
 
 		class SearchResult
@@ -169,8 +173,8 @@ namespace RightmoveDownloader.Clients
 
 		class Location
 		{
-			public object latitude { get; set; }
-			public object longitude { get; set; }
+			public string latitude { get; set; }
+			public string longitude { get; set; }
 		}
 
 		class Listingupdate
@@ -470,8 +474,8 @@ namespace RightmoveDownloader.Clients
 
 		public class Location2
 		{
-			public float latitude { get; set; }
-			public float longitude { get; set; }
+			public string latitude { get; set; }
+			public string longitude { get; set; }
 		}
 
 		public class Listingupdate1

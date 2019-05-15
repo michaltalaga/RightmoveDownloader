@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Polly;
 using RightmoveDownloader.Clients;
 using RightmoveDownloader.Repositories;
@@ -33,14 +34,17 @@ namespace RightmoveDownloader
 		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddHttpClient<IRightmoveHttpClient, RightmoveHttpClient>().AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
+			services.AddHttpClient<IRightmoveHttpClient, RightmoveHttpClient>(client =>
+			{
+				client.DefaultRequestHeaders.Add("User-Agent", "C# App");
+			}).AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
 			{
 				TimeSpan.FromSeconds(1),
 				TimeSpan.FromSeconds(5),
 				TimeSpan.FromSeconds(10)
 			}));
 			services.AddSingleton<IGoogleSheetsClient>(new GoogleSheetsClient(File.ReadAllText("google-service-account.json"), configuration.GetValue<string>("GoogleAppName"), configuration.GetValue<string>("GoogleSpreadsheetId")));
-			services.AddSingleton<IGoogleMapsDistanceApiClient>(s=>new GoogleMapsDistanceApiClient(configuration.GetValue<string>("GoogleMapsApiKey"), s.GetService<IHttpClientFactory>()));
+			services.AddSingleton<IGoogleMapsDistanceApiClient>(s=>new GoogleMapsDistanceApiClient(configuration.GetValue<string>("GoogleMapsApiKey"), s.GetService<IHttpClientFactory>(), s.GetService<ILogger<GoogleMapsDistanceApiClient>>()));
 			services.AddTransient<IRightmoveDownloadService, RightmoveDownloadService>();
 			services.AddTransient<IDistanceCalculationService, DistanceCalculationService>();
 			services.AddTransient<IPropertyRepository, GoogleSheetsPropertyRespository>();
