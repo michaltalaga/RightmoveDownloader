@@ -23,7 +23,7 @@ namespace RightmoveDownloader.Services
 			
 			await foreach (var properties in propertyBatches)
 			{
-				propertiesRepository.AddProperties(properties);
+				await propertiesRepository.AddProperties(properties);
 			}
 
 		}

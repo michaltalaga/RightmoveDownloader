@@ -20,7 +20,7 @@ namespace RightmoveDownloader.Services
 		}
 		public async Task FindDistances(string toLocation)
 		{
-			var locations = propertyRepository.GetLocations(false).ToList();
+			var locations = await propertyRepository.GetLocations(false);
             foreach (var location in locations)
             {
                 var minutes = await googleMapsDistanceApiClient.GetMinutesBetweenPoints(location, toLocation);

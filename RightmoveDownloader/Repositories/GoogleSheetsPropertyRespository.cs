@@ -19,9 +19,9 @@ namespace RightmoveDownloader.Repositories
 		{
 			this.googleSheetsService = googleSheetsService;
 		}
-		public void AddProperties(IEnumerable<RightmoveHttpClient.Property> properties)
+		public async Task AddProperties(IEnumerable<RightmoveHttpClient.Property> properties)
 		{
-			var response = googleSheetsService.Get(propertiesRange);
+			var response = await googleSheetsService.Get(propertiesRange);
 			var newData = new ValueRange();
 			newData.Values = response.Values ?? new List<IList<object>>();
 			var firstRow = newData.Values[0];
@@ -46,11 +46,11 @@ namespace RightmoveDownloader.Repositories
 				existingEntry[8] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),distances!A:C,2,FALSE),-1)";
 				row++;
 			}
-			googleSheetsService.Update(newData, propertiesRange);
+			await googleSheetsService.Update(newData, propertiesRange);
 		}
-		public IEnumerable<string> GetLocations(bool includeCalculated = false)
+		public async Task<IEnumerable<string>> GetLocations(bool includeCalculated = false)
 		{
-			var response = googleSheetsService.Get(propertiesRange);
+			var response = await googleSheetsService.Get(propertiesRange);
 			return response.Values.Skip(1).Where(v => includeCalculated || (Convert.ToInt32(v[8]) == -1)).Select(v => (string)v[6]).Distinct().ToArray();
 		}
 	}

@@ -49,7 +49,6 @@ namespace RightmoveDownloader.Clients
 					throw;
 				}
 			}
-			return 0;
 		}
 		DateTime StartOfWeek(DateTime startDate, DayOfWeek startOfWeek)
 		{
