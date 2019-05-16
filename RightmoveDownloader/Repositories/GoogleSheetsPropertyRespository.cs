@@ -17,7 +17,7 @@ namespace RightmoveDownloader.Repositories
 		private readonly IGoogleSheetsClient googleSheetsService;
 		private readonly ILogger<GoogleSheetsPropertyRespository> logger;
 		const string propertiesRange = "properties!A:J";
-		const string travelTimesRange = "times!A:C";
+		const string travelTimesRange = "times!A:b";
 		public GoogleSheetsPropertyRespository(IGoogleSheetsClient googleSheetsService, ILogger<GoogleSheetsPropertyRespository> logger)
 		{
 			this.googleSheetsService = googleSheetsService;
@@ -29,6 +29,7 @@ namespace RightmoveDownloader.Repositories
 			var response = await googleSheetsService.Get(propertiesRange);
 			var newData = new ValueRange();
 			newData.Values = response.Values ?? new List<IList<object>>();
+			if (newData.Values.Count == 0) newData.Values.Add(GetHeaderRow());
 			var firstRow = newData.Values[0];
 			foreach (var property in properties)
 			{
@@ -55,6 +56,15 @@ namespace RightmoveDownloader.Repositories
 			await googleSheetsService.Update(newData, propertiesRange);
 			logger.LogInformation($"AddProperties(properties[{properties.Count()}]) - DONE");
 		}
+
+		private IList<object> GetHeaderRow()
+		{
+			return new[]
+			{
+				"Id", "LastSeen", "Status", "PricePerMonth", "Bedrooms", "NumberOfFloorPlans", "Location", "Url", "Distance"
+			};
+		}
+
 		public async Task<IEnumerable<string>> GetLocations(bool includeCalculated = false)
 		{
 			var response = await googleSheetsService.Get(propertiesRange);
