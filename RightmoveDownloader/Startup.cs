@@ -63,8 +63,8 @@ namespace RightmoveDownloader
                 Authorization = new [] { new NoAuthHangfireFilter() }
             });
 			app.UseHangfireServer();
-			recurringJobManager.AddOrUpdate("Download", Job.FromExpression<IRightmoveDownloadService>(service => service.Download(configuration.GetValue<string>("locationIdentifier"), configuration.GetValue<int>("radius"), configuration.GetValue<int>("minBedrooms"), configuration.GetValue<int>("maxBedrooms"), configuration.GetValue<int>("minPrice"), configuration.GetValue<int>("maxPrice"))), Cron.Yearly(2, 31));
-			recurringJobManager.AddOrUpdate("Calculate Distances", Job.FromExpression<IDistanceCalculationService>(service => service.FindDistances(configuration.GetValue<string>("toLocation"))), Cron.Yearly(2, 31));
+			recurringJobManager.AddOrUpdate("Download", Job.FromExpression<IRightmoveDownloadService>(service => service.Download(configuration.GetValue<string>("locationIdentifier"), configuration.GetValue<int>("radius"), configuration.GetValue<int>("minBedrooms"), configuration.GetValue<int>("maxBedrooms"), configuration.GetValue<int>("minPrice"), configuration.GetValue<int>("maxPrice"))), configuration.GetValue<string>("DownloadPropertiesSchedule"));
+			recurringJobManager.AddOrUpdate("Calculate Distances", Job.FromExpression<IDistanceCalculationService>(service => service.FindDistances(configuration.GetValue<string>("toLocation"))), configuration.GetValue<string>("DownloadPropertiesSchedule"));
 		}
 	}
 }
