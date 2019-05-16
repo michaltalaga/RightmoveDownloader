@@ -22,7 +22,7 @@ Given a location and search criteria finds properties and puts them in google sh
 ### Windows/Powershell
 ~~~~
 docker run --name rightmove `
--p 321:80 --rm -d `
+-p 321:80 -d --restart unless-stopped `
 -v ABSOLUTE_PATH_TO\google-service-account.json:/app/google-service-account.json `
 -e locationIdentifier="POSTCODE%5E1274909" `
 -e toLocation="51.5165114,-0.1239118" `
@@ -40,7 +40,7 @@ mikeon/rightmove
 ### Linux/Bash
 ~~~~
 docker run --name rightmove \
--p 321:80 --rm -d \
+-p 321:80 -d --restart unless-stopped \
 -v ABSOLUTE_PATH_TO/google-service-account.json:/app/google-service-account.json \
 -e locationIdentifier="POSTCODE%5E1274909" \
 -e toLocation="51.5165114,-0.1239118" \
