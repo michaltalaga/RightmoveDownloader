@@ -21,7 +21,7 @@ Given a location and search criteria finds properties and puts them in google sh
 ## Run from Docker image
 ### Windows/Powershell
 ~~~~
-docker run `
+docker run --name rightmove `
 -p 321:80 --rm -d `
 -v ABSOLUTE_PATH_TO\google-service-account.json:/app/google-service-account.json `
 -e locationIdentifier="POSTCODE%5E1274909" `
@@ -39,7 +39,7 @@ mikeon/rightmove
 
 ### Linux/Bash
 ~~~~
-docker run \
+docker run --name rightmove \
 -p 321:80 --rm -d \
 -v ABSOLUTE_PATH_TO/google-service-account.json:/app/google-service-account.json \
 -e locationIdentifier="POSTCODE%5E1274909" \
