@@ -23,7 +23,7 @@ namespace RightmoveDownloader.Clients
 			const int priceStep = 10;
 			for (int i = minPrice; i <= maxPrice; i += priceStep)
 			{
-				string url = $"https://www.rightmove.co.uk/api/_search?locationIdentifier={locationIdentifier}&minBedrooms={minBedrooms}&minPrice={i}&maxPrice={i + priceStep}&numberOfPropertiesPerPage=48&radius={radius}&sortType=6&includeLetAgreed=false&viewType=LIST&dontShow=retirement%2ChouseShare&channel=RENT&areaSizeUnit=sqm&currencyCode=GBP&isFetching=false&index=";
+				string url = $"https://www.rightmove.co.uk/api/_search?locationIdentifier={locationIdentifier}&minBedrooms={minBedrooms}&maxBedrooms={maxBedrooms}&minPrice={i}&maxPrice={i + priceStep}&numberOfPropertiesPerPage=48&radius={radius}&sortType=6&includeLetAgreed=false&viewType=LIST&dontShow=retirement%2ChouseShare&channel=RENT&areaSizeUnit=sqm&currencyCode=GBP&isFetching=false&index=";
 				var pageIndex = 0;
 				while (true)
 				{
