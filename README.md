@@ -26,8 +26,8 @@ docker run --name rightmove `
 -v ABSOLUTE_PATH_TO\google-service-account.json:/app/google-service-account.json `
 -e LocationIdentifier="POSTCODE%5E1274909" `
 -e ToLocation="51.5165114,-0.1239118" `
--e DownloadPropertiesSchedule="0 0 4 1/1 * ? *" `
--e DownloadDistancesSchedule="0 0 6 1/1 * ? *" `
+-e DownloadPropertiesSchedule="0 4 * * *" `
+-e DownloadDistancesSchedule="0 6 * * *" `
 -e Radius=20 `
 -e MinBedrooms=2 `
 -e MaxBedrooms=3 `
@@ -46,8 +46,8 @@ docker run --name rightmove \
 -v ABSOLUTE_PATH_TO/google-service-account.json:/app/google-service-account.json \
 -e LocationIdentifier="POSTCODE%5E1274909" \
 -e ToLocation="51.5165114,-0.1239118" \
--e DownloadPropertiesSchedule="0 0 4 1/1 * ? *" \
--e DownloadDistancesSchedule="0 0 6 1/1 * ? *" \
+-e DownloadPropertiesSchedule="0 4 * * *" \
+-e DownloadDistancesSchedule="0 6 * * *" \
 -e Radius=20 \
 -e MinBedrooms=2 \
 -e MaxBedrooms=3 \
