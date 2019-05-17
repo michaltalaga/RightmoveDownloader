@@ -58,3 +58,9 @@ docker run --name rightmove \
 -e GoogleSpreadsheetId=1_abcDefGhIj-kLMNoPQ_RsTU0_vw0xY000zabCdefg0 \
 mikeon/rightmove
 ~~~~
+
+### Optional
+By default Hangfire will use InMemoryStorage. If you mount a folder to /app/Hangfire LiteDB will be used instead.
+~~~~
+-v ABSOLUTE_PATH_TO/Hangfire:/app/Hangfire
+~~~~
