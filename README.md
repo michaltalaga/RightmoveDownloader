@@ -24,15 +24,15 @@ Given a location and search criteria finds properties and puts them in google sh
 docker run --name rightmove `
 -p 321:80 -d --restart unless-stopped `
 -v ABSOLUTE_PATH_TO\google-service-account.json:/app/google-service-account.json `
--e locationIdentifier="POSTCODE%5E1274909" `
--e toLocation="51.5165114,-0.1239118" `
+-e LocationIdentifier="POSTCODE%5E1274909" `
+-e ToLocation="51.5165114,-0.1239118" `
 -e DownloadPropertiesSchedule="0 0 4 1/1 * ? *" `
 -e DownloadDistancesSchedule="0 0 6 1/1 * ? *" `
--e radius=20 `
--e minBedrooms=2 `
--e maxBedrooms=3 `
--e minPrice=1400 `
--e maxPrice=1800 `
+-e Radius=20 `
+-e MinBedrooms=2 `
+-e MaxBedrooms=3 `
+-e MinPrice=1400 `
+-e MaxPrice=1800 `
 -e GoogleMapsApiKey=AbcDeFghuJKLMN0pQR0Tz0ABADASQWEADADADc `
 -e GoogleAppName=rightmove `
 -e GoogleSpreadsheetId=1_abcDefGhIj-kLMNoPQ_RsTU0_vw0xY000zabCdefg0 `
@@ -44,15 +44,15 @@ mikeon/rightmove
 docker run --name rightmove \
 -p 321:80 -d --restart unless-stopped \
 -v ABSOLUTE_PATH_TO/google-service-account.json:/app/google-service-account.json \
--e locationIdentifier="POSTCODE%5E1274909" \
--e toLocation="51.5165114,-0.1239118" \
+-e LocationIdentifier="POSTCODE%5E1274909" \
+-e ToLocation="51.5165114,-0.1239118" \
 -e DownloadPropertiesSchedule="0 0 4 1/1 * ? *" \
 -e DownloadDistancesSchedule="0 0 6 1/1 * ? *" \
--e radius=20 \
--e minBedrooms=2 \
--e maxBedrooms=3 \
--e minPrice=1400 \
--e maxPrice=1800 \
+-e Radius=20 \
+-e MinBedrooms=2 \
+-e MaxBedrooms=3 \
+-e MinPrice=1400 \
+-e MaxPrice=1800 \
 -e GoogleMapsApiKey=AbcDeFghuJKLMN0pQR0Tz0ABADASQWEADADADc \
 -e GoogleAppName=rightmove \
 -e GoogleSpreadsheetId=1_abcDefGhIj-kLMNoPQ_RsTU0_vw0xY000zabCdefg0 \
