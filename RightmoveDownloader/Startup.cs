@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Google.Apis.Sheets.v4;
 using Hangfire;
 using Hangfire.Common;
+using Hangfire.LiteDB;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -51,7 +52,14 @@ namespace RightmoveDownloader
 			services.AddTransient<IPropertyRepository, GoogleSheetsPropertyRespository>();
 			services.AddHangfire(config =>
 			{
-				config.UseMemoryStorage();
+				if (Directory.Exists("Hangfire"))
+				{
+					config.UseLiteDbStorage(Path.Combine("Hangfire", "hangfire.db"));
+				}
+				else
+				{
+					config.UseMemoryStorage();
+				}				
 			});
 		}
 
