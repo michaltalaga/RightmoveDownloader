@@ -61,7 +61,7 @@ namespace RightmoveDownloader.Repositories
                 logger.LogInformation($"AddProperties(properties[{properties.Count()}]) - NOTHING TO UPDATE");
                 return;
             }
-            foreach (var row in newData.Values.Skip(1).Where(r => (string)r[8] == "-1" || (string)r[8] == ""))
+            foreach (var row in newData.Values.Skip(1).Where(r => (string)r[8] == "-1" || string.IsNullOrEmpty((string)r[8])))
             {
                 row[8] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:C,2,FALSE),-1)";
             }
