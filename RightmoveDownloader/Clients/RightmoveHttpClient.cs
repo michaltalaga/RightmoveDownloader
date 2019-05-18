@@ -481,7 +481,7 @@ namespace RightmoveDownloader.Clients
 		public class Listingupdate1
 		{
 			public string listingUpdateReason { get; set; }
-			public DateTime listingUpdateDate { get; set; }
+			public DateTime? listingUpdateDate { get; set; }
 		}
 
 		public class Price1
