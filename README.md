@@ -36,6 +36,7 @@ docker run --name rightmove `
 -e GoogleMapsApiKey=AbcDeFghuJKLMN0pQR0Tz0ABADASQWEADADADc `
 -e GoogleAppName=rightmove `
 -e GoogleSpreadsheetId=1_abcDefGhIj-kLMNoPQ_RsTU0_vw0xY000zabCdefg0 `
+-e SENTRY_DSN="https://abcdef1234567890abcdef1234567890@sentry.io/1234567" `
 mikeon/rightmove
 ~~~~
 
@@ -56,6 +57,7 @@ docker run --name rightmove \
 -e GoogleMapsApiKey=AbcDeFghuJKLMN0pQR0Tz0ABADASQWEADADADc \
 -e GoogleAppName=rightmove \
 -e GoogleSpreadsheetId=1_abcDefGhIj-kLMNoPQ_RsTU0_vw0xY000zabCdefg0 \
+-e SENTRY_DSN="https://abcdef1234567890abcdef1234567890@sentry.io/1234567" \
 mikeon/rightmove
 ~~~~
 
