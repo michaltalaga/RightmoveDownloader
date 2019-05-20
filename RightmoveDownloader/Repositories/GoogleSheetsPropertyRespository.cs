@@ -47,7 +47,7 @@ namespace RightmoveDownloader.Repositories
                 {
                     needsUpdate = true;
                 }
-                existingEntry[1] = DateTime.Now; //LastSeen
+                existingEntry[1] = DateTime.Now.Date.ToString("yyyy-MM-dd"); //LastSeen
                                                  //1 LastSeen
                                                  //2 Status
                 existingEntry[3] = property.price.frequency == "monthly" ? property.price.amount : property.price.amount * 4; // PricePerMonth
