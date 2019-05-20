@@ -32,7 +32,9 @@ namespace RightmoveDownloader.Repositories
             if (newData.Values.Count == 0) newData.Values.Add(GetHeaderRow());
             var firstRow = newData.Values[0];
             var needsUpdate = false;
-            foreach (var property in properties)
+			var lastSeenTodayString = DateTime.Now.ToString("yyyy-MM-dd");
+
+			foreach (var property in properties)
             {
                 var existingEntry = newData.Values.SingleOrDefault(v => (string)v[0] == property.id);
                 if (existingEntry == null)
@@ -43,7 +45,7 @@ namespace RightmoveDownloader.Repositories
                     newData.Values.Add(existingEntry);
                     needsUpdate = true;
                 }
-                else if (((DateTime)existingEntry[1]).Date != DateTime.Now.Date)
+                else if ((string)existingEntry[1] != lastSeenTodayString)
                 {
                     needsUpdate = true;
                 }
