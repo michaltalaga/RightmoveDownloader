@@ -52,6 +52,7 @@ namespace RightmoveDownloader
 			services.AddTransient<IPropertyRepository, GoogleSheetsPropertyRespository>();
 			services.AddHangfire(config =>
 			{
+				i break things
 				if (Directory.Exists("Hangfire"))
 				{
 					config.UseLiteDbStorage(Path.Combine("Hangfire", "hangfire.db"));
