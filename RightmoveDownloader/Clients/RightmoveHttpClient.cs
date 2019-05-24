@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace RightmoveDownloader.Clients
 {
@@ -21,25 +22,39 @@ namespace RightmoveDownloader.Clients
 		{
 			logger.LogInformation($"GetProperties({locationIdentifier}, {radius}, {minBedrooms}, {maxBedrooms}, {minPrice}, {maxPrice})");
 			const int priceStep = 10;
+			var tasks = new List<Task<IEnumerable<Property>>>();
 			for (int i = minPrice; i <= maxPrice; i += priceStep)
 			{
 				string url = $"https://www.rightmove.co.uk/api/_search?locationIdentifier={locationIdentifier}&minBedrooms={minBedrooms}&maxBedrooms={maxBedrooms}&minPrice={i}&maxPrice={i + priceStep}&numberOfPropertiesPerPage=48&radius={radius}&sortType=6&includeLetAgreed=false&viewType=LIST&dontShow=retirement%2ChouseShare&channel=RENT&areaSizeUnit=sqm&currencyCode=GBP&isFetching=false&index=";
-				var pageIndex = 0;
-				while (true)
-				{
-					logger.LogInformation($"GetAsync({url + pageIndex})");
-					var response = await httpClient.GetAsync(url + pageIndex);
-					var result = await response.Content.ReadAsAsync<SearchResult>();
-					yield return result.properties.Where(p => p.featuredProperty == false).Select(p =>
-					{
-						p.propertyUrl = new Uri(new Uri("https://www.rightmove.co.uk/"), p.propertyUrl).ToString();
-						return p;
-					});
-					if (result.pagination.next == null) break;
-					pageIndex = result.pagination.next.Value;
-				}
+				tasks.Add(GetPropertiesFor(url));
+			}
+			while (tasks.Count > 0)
+			{
+				var finished = await Task.WhenAny(tasks);
+				tasks.Remove(finished);
+				yield return await finished;
 			}
 			logger.LogInformation($"GetProperties({locationIdentifier}, {radius}, {minBedrooms}, {maxBedrooms}, {minPrice}, {maxPrice}) - DONE");
+		}
+		private async Task<IEnumerable<Property>> GetPropertiesFor(string url)
+		{
+			var pageIndex = 0;
+			var properties = new List<Property>();
+			while (true)
+			{
+				logger.LogInformation($"GetAsync({url + pageIndex})");
+				var response = await httpClient.GetAsync(url + pageIndex);
+				var result = await response.Content.ReadAsAsync<SearchResult>();
+				logger.LogInformation($"GetAsync({url + pageIndex}) - DONE");
+				properties.AddRange(result.properties.Where(p => p.featuredProperty == false).Select(p =>
+				{
+					p.propertyUrl = new Uri(new Uri("https://www.rightmove.co.uk/"), p.propertyUrl).ToString();
+					return p;
+				}));
+				if (result.pagination.next == null) break;
+				pageIndex = result.pagination.next.Value;
+			}
+			return properties;
 		}
 
 		class SearchResult

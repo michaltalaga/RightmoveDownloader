@@ -39,7 +39,9 @@ namespace RightmoveDownloader
 			services.AddHttpClient<IRightmoveHttpClient, RightmoveHttpClient>(client =>
 			{
 				client.DefaultRequestHeaders.Add("User-Agent", "C# App");
-			}).AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
+			})
+			.AddPolicyHandler(Policy.BulkheadAsync<HttpResponseMessage>(5, Int32.MaxValue))
+			.AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
 			{
 				TimeSpan.FromSeconds(1),
 				TimeSpan.FromSeconds(5),
