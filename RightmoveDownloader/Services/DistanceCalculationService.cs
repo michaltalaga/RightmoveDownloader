@@ -29,7 +29,7 @@ namespace RightmoveDownloader.Services
 			logger.LogInformation($"FindDistances({toLocation}|locations[{locations.Count()}])");
             foreach (var locationsBatch in locations.Batch(10))
             {
-				var travelTimes = await Task.WhenAll(locationsBatch.Select(location => googleMapsDistanceApiClient.GetTravelTime(location, toLocation)));
+				var travelTimes = await Task.WhenAll(locationsBatch.Select(location => googleMapsDistanceApiClient.GetTravelInfo(location, toLocation)));
 				await propertyRepository.AddTravelTimes(travelTimes);
 			}
 			logger.LogInformation($"FindDistances({toLocation}|locations[{locations.Count()}]) - DONE");
