@@ -442,7 +442,6 @@ namespace RightmoveDownloader.Clients
 		public class Property
 		{
 			public string id { get; set; }
-			public string nope { get; set; }
 			public int bedrooms { get; set; }
 			public int numberOfImages { get; set; }
 			public int numberOfFloorplans { get; set; }
