@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace RightmoveDownloader.Clients
 		private readonly string apiKey;
 		private readonly IHttpClientFactory httpClientFactory;
 		private readonly ILogger<GoogleMapsDistanceApiClient> logger;
+		Regex postCodeRegex = new Regex("^.* ([A-Za-z][A-Ha-hK-Yk-y]?[0-9][A-Za-z0-9]? [0-9][A-Za-z]{2}|[Gg][Ii][Rr] 0[Aa]{2}), .*$");
 
 		public GoogleMapsDistanceApiClient(string apiKey, IHttpClientFactory httpClientFactory, ILogger<GoogleMapsDistanceApiClient> logger)
 		{
@@ -20,18 +22,20 @@ namespace RightmoveDownloader.Clients
 			this.httpClientFactory = httpClientFactory;
 			this.logger = logger;
 		}
-		public async Task<IGoogleMapsDistanceApiClient.TravelTime> GetTravelTime(string fromLocation, string toLocation)
+		public async Task<IGoogleMapsDistanceApiClient.TravelInfo> GetTravelInfo(string fromLocation, string toLocation)
 		{
 			logger.LogInformation($"GetTravelTime({fromLocation}, {toLocation})");
 			var firstWorkingMonday = StartOfWeek(DateTime.Now.AddDays(7), DayOfWeek.Monday).Date.AddHours(8);
 			var timestamp1 = (Int32)(firstWorkingMonday.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 			var timestamp2 = (Int32)(firstWorkingMonday.AddMinutes(15).Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-			var minutes = Math.Min(await GetMinutesBetweenPoints(fromLocation, toLocation, timestamp1), await GetMinutesBetweenPoints(fromLocation, toLocation, timestamp2));
-			logger.LogInformation($"GetTravelTime({fromLocation}, {toLocation}) - {minutes}");
-			return new IGoogleMapsDistanceApiClient.TravelTime { From = fromLocation, To = toLocation, Minutes = minutes };
+			var travelInfo1 = await GetTravelInfo(fromLocation, toLocation, timestamp1);
+			var travelInfo2 = await GetTravelInfo(fromLocation, toLocation, timestamp2);
+			travelInfo1.Minutes = Math.Min(travelInfo1.Minutes, travelInfo2.Minutes);
+			logger.LogInformation($"GetTravelTime({fromLocation}/{travelInfo1.FromPostCode}, {toLocation}/{travelInfo1.ToPostCode}) - {travelInfo1.Minutes}");
+			return travelInfo1;
 		}
 
-		private async Task<int> GetMinutesBetweenPoints(string fromLocation, string toLocation, int timestamp)
+		private async Task<IGoogleMapsDistanceApiClient.TravelInfo> GetTravelInfo(string fromLocation, string toLocation, int timestamp)
 		{
 			var url = $"https://maps.googleapis.com/maps/api/directions/json?mode=transit&arrival_time={timestamp}&origin={fromLocation}&destination={toLocation}&key=" + apiKey;
 
@@ -49,10 +53,23 @@ namespace RightmoveDownloader.Clients
 				else if (result.status == "ZERO_RESULTS" || result.status == "NOT_FOUND")
 				{
 					logger.LogWarning($"GetMinutesBetweenPoints({fromLocation}, {toLocation}, {timestamp}) - {result.status}");
-					return  int.MaxValue ;
+					return new IGoogleMapsDistanceApiClient.TravelInfo { From = fromLocation, To = toLocation, Minutes = int.MaxValue };
 				}
-				return  (int)Math.Ceiling((decimal)result.routes[0].legs[0].duration.value / 60m);
+				return new IGoogleMapsDistanceApiClient.TravelInfo
+				{
+					From = fromLocation,
+					FromPostCode = GetPostCode(result.routes[0].legs[0].start_address),
+					To = toLocation,
+					ToPostCode = GetPostCode(result.routes[0].legs[0].end_address),
+					Minutes = (int)Math.Ceiling((decimal)result.routes[0].legs[0].duration.value / 60m)
+				};
 			}
+		}
+
+		private string GetPostCode(string address)
+		{
+			var match = postCodeRegex.Match(address);
+			return match.Success ? match.Groups[1].Value : null;
 		}
 
 		DateTime StartOfWeek(DateTime startDate, DayOfWeek startOfWeek)
