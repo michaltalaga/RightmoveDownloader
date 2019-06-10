@@ -70,7 +70,7 @@ namespace RightmoveDownloader.Clients
 		{
 			if (string.IsNullOrEmpty(address)) return "X";
 			var match = postCodeRegex.Match(address);
-			return match.Success ? match.Groups[1].Value : "X";
+			return match.Success && !string.IsNullOrEmpty(match.Groups[1].Value) ? match.Groups[1].Value : "X";
 		}
 
 		DateTime StartOfWeek(DateTime startDate, DayOfWeek startOfWeek)
