@@ -70,7 +70,10 @@ namespace RightmoveDownloader.Clients
 		{
 			if (string.IsNullOrWhiteSpace(address)) return "X";
 			var match = postCodeRegex.Match(address);
-			return match.Success && !string.IsNullOrWhiteSpace(match.Groups[1].Value) ? match.Groups[1].Value : "X";
+			if (!match.Success) return "X";
+			var postCode = match.Groups[1].Value;
+			if (postCode?.Length < 2) return "X";
+			return postCode;
 		}
 
 		DateTime StartOfWeek(DateTime startDate, DayOfWeek startOfWeek)
