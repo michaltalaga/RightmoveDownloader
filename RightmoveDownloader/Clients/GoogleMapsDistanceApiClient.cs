@@ -53,7 +53,7 @@ namespace RightmoveDownloader.Clients
 				else if (result.status == "ZERO_RESULTS" || result.status == "NOT_FOUND")
 				{
 					logger.LogWarning($"GetMinutesBetweenPoints({fromLocation}, {toLocation}, {timestamp}) - {result.status}");
-					return new IGoogleMapsDistanceApiClient.TravelInfo { From = fromLocation, To = toLocation, Minutes = int.MaxValue };
+					return new IGoogleMapsDistanceApiClient.TravelInfo { From = fromLocation, FromPostCode = "X", To = toLocation, ToPostCode = "X", Minutes = int.MaxValue };
 				}
 				return new IGoogleMapsDistanceApiClient.TravelInfo
 				{
