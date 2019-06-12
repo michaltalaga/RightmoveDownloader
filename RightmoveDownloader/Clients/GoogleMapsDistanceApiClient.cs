@@ -68,9 +68,9 @@ namespace RightmoveDownloader.Clients
 
 		private string GetPostCode(string address)
 		{
-			if (string.IsNullOrEmpty(address)) return "X";
+			if (string.IsNullOrWhiteSpace(address)) return "X";
 			var match = postCodeRegex.Match(address);
-			return match.Success && !string.IsNullOrEmpty(match.Groups[1].Value) ? match.Groups[1].Value : "X";
+			return match.Success && !string.IsNullOrWhiteSpace(match.Groups[1].Value) ? match.Groups[1].Value : "X";
 		}
 
 		DateTime StartOfWeek(DateTime startDate, DayOfWeek startOfWeek)
