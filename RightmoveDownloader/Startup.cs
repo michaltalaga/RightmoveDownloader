@@ -68,7 +68,8 @@ namespace RightmoveDownloader
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IRecurringJobManager recurringJobManager)
 		{
-            app.UseHangfireDashboard(options: new DashboardOptions
+			GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
+			app.UseHangfireDashboard(options: new DashboardOptions
             {
                 Authorization = new [] { new NoAuthHangfireFilter() }
             });
