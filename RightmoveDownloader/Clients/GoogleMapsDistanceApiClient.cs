@@ -58,22 +58,31 @@ namespace RightmoveDownloader.Clients
 				return new IGoogleMapsDistanceApiClient.TravelInfo
 				{
 					From = fromLocation,
-					FromPostCode = GetPostCode(result.routes[0].legs[0].start_address),
+					FromPostCode = GetPostCode(fromLocation, () => result.routes[0].legs[0].start_address),
 					To = toLocation,
-					ToPostCode = GetPostCode(result.routes[0].legs[0].end_address),
+					ToPostCode = GetPostCode(toLocation, () => result.routes[0].legs[0].end_address),
 					Minutes = (int)Math.Ceiling((decimal)result.routes[0].legs[0].duration.value / 60m)
 				};
 			}
 		}
 
-		private string GetPostCode(string address)
+		private string GetPostCode(string location, Func<string> getPostCode)
 		{
-			if (string.IsNullOrWhiteSpace(address)) return "X";
-			var match = postCodeRegex.Match(address);
-			if (!match.Success) return "X";
-			var postCode = match.Groups[1].Value;
-			if (postCode?.Length < 2) return "X";
-			return postCode;
+			try
+			{
+				var address = getPostCode();
+				if (string.IsNullOrWhiteSpace(address)) return "X";
+				var match = postCodeRegex.Match(address);
+				if (!match.Success) return "X";
+				var postCode = match.Groups[1].Value;
+				if (postCode?.Length < 2) return "X";
+				return postCode;
+			}
+			catch (Exception ex)
+			{
+				logger.LogWarning(ex, "Failed to get postcode for: " + location);
+				return "X";
+			}
 		}
 
 		DateTime StartOfWeek(DateTime startDate, DayOfWeek startOfWeek)
