@@ -16,8 +16,8 @@ namespace RightmoveDownloader.Repositories
 	{
 		private readonly IGoogleSheetsClient googleSheetsService;
 		private readonly ILogger<GoogleSheetsPropertyRespository> logger;
-		const string propertiesRange = "properties!A:J";
-		const string travelTimesRange = "times!A:E";
+		const string propertiesRange = "properties!A:L";
+		const string travelTimesRange = "times!A:G";
 		public GoogleSheetsPropertyRespository(IGoogleSheetsClient googleSheetsService, ILogger<GoogleSheetsPropertyRespository> logger)
 		{
 			this.googleSheetsService = googleSheetsService;
@@ -65,15 +65,25 @@ namespace RightmoveDownloader.Repositories
 			}
 			foreach (var row in newData.Values.Skip(1))
 			{
-				var distanceCell = (string)row[8];
-				if (distanceCell == "-1" || string.IsNullOrEmpty(distanceCell))
-				{
-					row[8] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:E,5,FALSE),-1)";
-				}
-				var postCodeCell = (string)row[9];
+				var postCodeCell = (string)row[8];
 				if (postCodeCell == "X" || string.IsNullOrEmpty(postCodeCell))
 				{
-					row[9] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:E,2,FALSE),\"X\")";
+					row[8] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,2,FALSE),\"X\")";
+				}
+				var transitCell = (string)row[9];
+				if (transitCell == "-1" || string.IsNullOrEmpty(transitCell))
+				{
+					row[9] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,5,FALSE),-1)";
+				}
+				var walkingCell = (string)row[10];
+				if (walkingCell == "-1" || string.IsNullOrEmpty(walkingCell))
+				{
+					row[10] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,6,FALSE),-1)";
+				}
+				var bicyclingCell = (string)row[11];
+				if (bicyclingCell == "-1" || string.IsNullOrEmpty(bicyclingCell))
+				{
+					row[11] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,7,FALSE),-1)";
 				}
 			}
 			await googleSheetsService.Update(newData, propertiesRange);
@@ -84,7 +94,8 @@ namespace RightmoveDownloader.Repositories
 		{
 			return new[]
 			{
-				"Id", "LastSeen", "Status", "PricePerMonth", "Bedrooms", "NumberOfFloorPlans", "Location", "Url", "Distance", "PostCode"
+				//0    1           2         3                4           5                     6           7      8           9          10         11
+				"Id", "LastSeen", "Status", "PricePerMonth", "Bedrooms", "NumberOfFloorPlans", "Location", "Url", "PostCode", "Transit", "Walking", "Bicycling"
 			};
 		}
 
@@ -110,6 +121,8 @@ namespace RightmoveDownloader.Repositories
 					travelTime.To,
 					travelTime.ToPostCode,
 					travelTime.TransitMinutes,
+					travelTime.WalkingMinutes,
+					travelTime.BicyclingMinutes
 				});
 			}
 			await googleSheetsService.Append(newData, travelTimesRange);
