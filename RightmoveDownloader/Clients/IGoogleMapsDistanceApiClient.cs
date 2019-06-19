@@ -12,6 +12,8 @@ namespace RightmoveDownloader.Clients
 			public string To { get; set; }
 			public string ToPostCode { get; set; }
 			public int TransitMinutes { get; set; }
+			public int WalkingMinutes { get; set; }
+			public int BicyclingMinutes { get; set; }
 		}
 	}
 }
