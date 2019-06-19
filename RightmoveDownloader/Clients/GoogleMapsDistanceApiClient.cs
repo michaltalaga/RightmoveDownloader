@@ -35,7 +35,7 @@ namespace RightmoveDownloader.Clients
 			travelInfo1.TransitMinutes = Math.Min(travelInfo1.TransitMinutes, travelInfo2.TransitMinutes);
 			travelInfo1.WalkingMinutes = travelInfoWalking.TransitMinutes;
 			travelInfo1.BicyclingMinutes = travelInfoBicycling.TransitMinutes;
-			logger.LogInformation($"GetTravelTime({fromLocation}/{travelInfo1.FromPostCode}, {toLocation}/{travelInfo1.ToPostCode}) - {travelInfo1.TransitMinutes}");
+			logger.LogInformation($"GetTravelTime({fromLocation}/{travelInfo1.FromPostCode}, {toLocation}/{travelInfo1.ToPostCode}) - {travelInfo1.TransitMinutes}/{travelInfo1.WalkingMinutes}/{travelInfo1.BicyclingMinutes}");
 			return travelInfo1;
 		}
 
