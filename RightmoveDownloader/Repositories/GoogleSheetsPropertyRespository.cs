@@ -102,7 +102,7 @@ namespace RightmoveDownloader.Repositories
 		public async Task<IEnumerable<string>> GetLocations(bool includeCalculated = false)
 		{
 			var response = await googleSheetsService.Get(propertiesRange);
-			return response.Values.Skip(1).Where(v => includeCalculated || (Convert.ToInt32(v[8]) == -1)).Select(v => (string)v[6]).Distinct().ToArray();
+			return response.Values.Skip(1).Where(v => includeCalculated || (Convert.ToInt32(v[9]) == -1)).Select(v => (string)v[6]).Distinct().ToArray();
 		}
 
 		public async Task AddTravelTimes(IEnumerable<IGoogleMapsDistanceApiClient.TravelInfo> travelTimes)
