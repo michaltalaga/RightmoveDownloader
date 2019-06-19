@@ -44,11 +44,13 @@ namespace RightmoveDownloader.Clients
 			var url = $"https://maps.googleapis.com/maps/api/directions/json?mode={mode}&arrival_time={timestamp}&origin={fromLocation}&destination={toLocation}&key=" + apiKey;
 
 			var client = httpClientFactory.CreateClient();
-			while (true)
+			int retryCount = 0;
+			while (true && retryCount < 10)
 			{
+				retryCount++;
 				var response = await client.GetAsync(url);
 				var result = await response.Content.ReadAsAsync<GoogleapisResult>();
-				if (result.status == "OVER_QUERY_LIMIT")
+				if (result.status == "OVER_QUERY_LIMIT" || result.status == "UNKNOWN_ERROR")
 				{
 					logger.LogWarning($"GetMinutesBetweenPoints({fromLocation}, {toLocation}, {timestamp}) - OVER_QUERY_LIMIT");
 					Thread.Sleep(1000);
@@ -57,7 +59,7 @@ namespace RightmoveDownloader.Clients
 				else if (result.status == "ZERO_RESULTS" || result.status == "NOT_FOUND")
 				{
 					logger.LogWarning($"GetMinutesBetweenPoints({fromLocation}, {toLocation}, {timestamp}) - {result.status}");
-					return new IGoogleMapsDistanceApiClient.TravelInfo { From = fromLocation, FromPostCode = "X", To = toLocation, ToPostCode = "X", TransitMinutes = int.MaxValue };
+					break;
 				}
 				return new IGoogleMapsDistanceApiClient.TravelInfo
 				{
@@ -68,6 +70,12 @@ namespace RightmoveDownloader.Clients
 					TransitMinutes = (int)Math.Ceiling((decimal)result.routes[0].legs[0].duration.value / 60m)
 				};
 			}
+			return GetNoResultsTravelInfo(fromLocation, toLocation);
+		}
+
+		private static IGoogleMapsDistanceApiClient.TravelInfo GetNoResultsTravelInfo(string fromLocation, string toLocation)
+		{
+			return new IGoogleMapsDistanceApiClient.TravelInfo { From = fromLocation, FromPostCode = "X", To = toLocation, ToPostCode = "X", TransitMinutes = int.MaxValue, WalkingMinutes = int.MaxValue, BicyclingMinutes = int.MaxValue };
 		}
 
 		private string GetPostCode(string location, Func<string> getPostCode)
