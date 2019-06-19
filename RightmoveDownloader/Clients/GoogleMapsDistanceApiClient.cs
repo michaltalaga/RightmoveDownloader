@@ -28,16 +28,20 @@ namespace RightmoveDownloader.Clients
 			var firstWorkingMonday = StartOfWeek(DateTime.Now.AddDays(7), DayOfWeek.Monday).Date.AddHours(8);
 			var timestamp1 = (Int32)(firstWorkingMonday.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 			var timestamp2 = (Int32)(firstWorkingMonday.AddMinutes(15).Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-			var travelInfo1 = await GetTravelInfo(fromLocation, toLocation, timestamp1);
-			var travelInfo2 = await GetTravelInfo(fromLocation, toLocation, timestamp2);
+			var travelInfo1 = await GetTravelInfo(fromLocation, toLocation, "transit", timestamp1);
+			var travelInfo2 = await GetTravelInfo(fromLocation, toLocation, "transit", timestamp2);
+			var travelInfoWalking = await GetTravelInfo(fromLocation, toLocation, "walking", timestamp1);
+			var travelInfoBicycling = await GetTravelInfo(fromLocation, toLocation, "bicycling", timestamp1);
 			travelInfo1.TransitMinutes = Math.Min(travelInfo1.TransitMinutes, travelInfo2.TransitMinutes);
+			travelInfo1.WalkingMinutes = travelInfoWalking.TransitMinutes;
+			travelInfo1.BicyclingMinutes = travelInfoBicycling.TransitMinutes;
 			logger.LogInformation($"GetTravelTime({fromLocation}/{travelInfo1.FromPostCode}, {toLocation}/{travelInfo1.ToPostCode}) - {travelInfo1.TransitMinutes}");
 			return travelInfo1;
 		}
 
-		private async Task<IGoogleMapsDistanceApiClient.TravelInfo> GetTravelInfo(string fromLocation, string toLocation, int timestamp)
+		private async Task<IGoogleMapsDistanceApiClient.TravelInfo> GetTravelInfo(string fromLocation, string toLocation, string mode, int timestamp)
 		{
-			var url = $"https://maps.googleapis.com/maps/api/directions/json?mode=transit&arrival_time={timestamp}&origin={fromLocation}&destination={toLocation}&key=" + apiKey;
+			var url = $"https://maps.googleapis.com/maps/api/directions/json?mode={mode}&arrival_time={timestamp}&origin={fromLocation}&destination={toLocation}&key=" + apiKey;
 
 			var client = httpClientFactory.CreateClient();
 			while (true)
