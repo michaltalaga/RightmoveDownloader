@@ -109,7 +109,7 @@ namespace RightmoveDownloader.Repositories
 					travelTime.FromPostCode,
 					travelTime.To,
 					travelTime.ToPostCode,
-					travelTime.Minutes,
+					travelTime.TransitMinutes,
 				});
 			}
 			await googleSheetsService.Append(newData, travelTimesRange);

@@ -30,8 +30,8 @@ namespace RightmoveDownloader.Clients
 			var timestamp2 = (Int32)(firstWorkingMonday.AddMinutes(15).Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 			var travelInfo1 = await GetTravelInfo(fromLocation, toLocation, timestamp1);
 			var travelInfo2 = await GetTravelInfo(fromLocation, toLocation, timestamp2);
-			travelInfo1.Minutes = Math.Min(travelInfo1.Minutes, travelInfo2.Minutes);
-			logger.LogInformation($"GetTravelTime({fromLocation}/{travelInfo1.FromPostCode}, {toLocation}/{travelInfo1.ToPostCode}) - {travelInfo1.Minutes}");
+			travelInfo1.TransitMinutes = Math.Min(travelInfo1.TransitMinutes, travelInfo2.TransitMinutes);
+			logger.LogInformation($"GetTravelTime({fromLocation}/{travelInfo1.FromPostCode}, {toLocation}/{travelInfo1.ToPostCode}) - {travelInfo1.TransitMinutes}");
 			return travelInfo1;
 		}
 
@@ -53,7 +53,7 @@ namespace RightmoveDownloader.Clients
 				else if (result.status == "ZERO_RESULTS" || result.status == "NOT_FOUND")
 				{
 					logger.LogWarning($"GetMinutesBetweenPoints({fromLocation}, {toLocation}, {timestamp}) - {result.status}");
-					return new IGoogleMapsDistanceApiClient.TravelInfo { From = fromLocation, FromPostCode = "X", To = toLocation, ToPostCode = "X", Minutes = int.MaxValue };
+					return new IGoogleMapsDistanceApiClient.TravelInfo { From = fromLocation, FromPostCode = "X", To = toLocation, ToPostCode = "X", TransitMinutes = int.MaxValue };
 				}
 				return new IGoogleMapsDistanceApiClient.TravelInfo
 				{
@@ -61,7 +61,7 @@ namespace RightmoveDownloader.Clients
 					FromPostCode = GetPostCode(fromLocation, () => result.routes[0].legs[0].start_address),
 					To = toLocation,
 					ToPostCode = GetPostCode(toLocation, () => result.routes[0].legs[0].end_address),
-					Minutes = (int)Math.Ceiling((decimal)result.routes[0].legs[0].duration.value / 60m)
+					TransitMinutes = (int)Math.Ceiling((decimal)result.routes[0].legs[0].duration.value / 60m)
 				};
 			}
 		}
