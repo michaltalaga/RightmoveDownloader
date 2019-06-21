@@ -36,7 +36,7 @@ namespace RightmoveDownloader.Repositories
 
 			foreach (var property in properties)
 			{
-				var existingEntry = newData.Values.SingleOrDefault(v => (string)v[(int)PropertyHeader.Id] == property.id);
+				var existingEntry = newData.Values.FirstOrDefault(v => (string)v[(int)PropertyHeader.Id] == property.id);
 				if (existingEntry == null)
 				{
 					existingEntry = new object[firstRow.Count];
@@ -94,11 +94,6 @@ namespace RightmoveDownloader.Repositories
 		private IList<object> GetHeaderRow()
 		{
 			return Enum.GetNames(typeof(PropertyHeader));
-			//return new[]
-			//{
-			//	//0    1            2           3         4                5           6                     7           8      9           10         11         12
-			//	"Id", "FirstSeen", "LastSeen", "Status", "PricePerMonth", "Bedrooms", "NumberOfFloorPlans", "Location", "Url", "PostCode", "Transit", "Walking", "Bicycling"
-			//};
 		}
 		enum PropertyHeader
 		{
