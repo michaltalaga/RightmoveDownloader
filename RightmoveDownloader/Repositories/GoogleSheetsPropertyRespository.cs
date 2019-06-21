@@ -36,27 +36,28 @@ namespace RightmoveDownloader.Repositories
 
 			foreach (var property in properties)
 			{
-				var existingEntry = newData.Values.SingleOrDefault(v => (string)v[0] == property.id);
+				var existingEntry = newData.Values.SingleOrDefault(v => (string)v[(int)PropertyHeader.Id] == property.id);
 				if (existingEntry == null)
 				{
 					existingEntry = new object[firstRow.Count];
-					existingEntry[0] = property.id;
-					existingEntry[2] = "new";
+					existingEntry[(int)PropertyHeader.Id] = property.id;
+					existingEntry[(int)PropertyHeader.FirstSeen] = DateTime.Now.Date.ToString("yyyy-MM-dd");
+					existingEntry[(int)PropertyHeader.Status] = "new";
 					newData.Values.Add(existingEntry);
 					needsUpdate = true;
 				}
-				else if ((string)existingEntry[1] != lastSeenTodayString)
+				else if ((string)existingEntry[(int)PropertyHeader.LastSeen] != lastSeenTodayString)
 				{
 					needsUpdate = true;
 				}
 				
-				existingEntry[1] = DateTime.Now.Date.ToString("yyyy-MM-dd"); //1 LastSeen
-																			 //2 Status
-				existingEntry[3] = property.price.frequency == "monthly" ? property.price.amount : property.price.amount * 4; // PricePerMonth
-				existingEntry[4] = property.bedrooms;
-				existingEntry[5] = property.numberOfFloorplans;
-				existingEntry[6] = property.location.latitude + "," + property.location.longitude;
-				existingEntry[7] = property.propertyUrl;
+				existingEntry[(int)PropertyHeader.LastSeen] = DateTime.Now.Date.ToString("yyyy-MM-dd");
+																			 
+				existingEntry[(int)PropertyHeader.PricePerMonth] = property.price.frequency == "monthly" ? property.price.amount : property.price.amount * 4;
+				existingEntry[(int)PropertyHeader.Bedrooms] = property.bedrooms;
+				existingEntry[(int)PropertyHeader.NumberOfFloorPlans] = property.numberOfFloorplans;
+				existingEntry[(int)PropertyHeader.Location] = property.location.latitude + "," + property.location.longitude;
+				existingEntry[(int)PropertyHeader.Url] = property.propertyUrl;
 			}
 			if (!needsUpdate)
 			{
@@ -65,25 +66,25 @@ namespace RightmoveDownloader.Repositories
 			}
 			foreach (var row in newData.Values.Skip(1))
 			{
-				var postCodeCell = (string)row[8];
+				var postCodeCell = (string)row[(int)PropertyHeader.PostCode];
 				if (postCodeCell == "X" || string.IsNullOrEmpty(postCodeCell))
 				{
-					row[8] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,2,FALSE),\"X\")";
+					row[(int)PropertyHeader.PostCode] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,2,FALSE),\"X\")";
 				}
-				var transitCell = (string)row[9];
+				var transitCell = (string)row[(int)PropertyHeader.Transit];
 				if (transitCell == "-1" || string.IsNullOrEmpty(transitCell))
 				{
-					row[9] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,5,FALSE),-1)";
+					row[(int)PropertyHeader.Transit] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,5,FALSE),-1)";
 				}
-				var walkingCell = (string)row[10];
+				var walkingCell = (string)row[(int)PropertyHeader.Walking];
 				if (walkingCell == "-1" || string.IsNullOrEmpty(walkingCell))
 				{
-					row[10] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,6,FALSE),-1)";
+					row[(int)PropertyHeader.Walking] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,6,FALSE),-1)";
 				}
-				var bicyclingCell = (string)row[11];
+				var bicyclingCell = (string)row[(int)PropertyHeader.Bicycling];
 				if (bicyclingCell == "-1" || string.IsNullOrEmpty(bicyclingCell))
 				{
-					row[11] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,7,FALSE),-1)";
+					row[(int)PropertyHeader.Bicycling] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,7,FALSE),-1)";
 				}
 			}
 			await googleSheetsService.Update(newData, propertiesRange);
@@ -92,17 +93,33 @@ namespace RightmoveDownloader.Repositories
 
 		private IList<object> GetHeaderRow()
 		{
-			return new[]
-			{
-				//0    1           2         3                4           5                     6           7      8           9          10         11
-				"Id", "LastSeen", "Status", "PricePerMonth", "Bedrooms", "NumberOfFloorPlans", "Location", "Url", "PostCode", "Transit", "Walking", "Bicycling"
-			};
+			return Enum.GetNames(typeof(PropertyHeader));
+			//return new[]
+			//{
+			//	//0    1            2           3         4                5           6                     7           8      9           10         11         12
+			//	"Id", "FirstSeen", "LastSeen", "Status", "PricePerMonth", "Bedrooms", "NumberOfFloorPlans", "Location", "Url", "PostCode", "Transit", "Walking", "Bicycling"
+			//};
 		}
-
+		enum PropertyHeader
+		{
+			Id = 0,
+			FirstSeen = 1,
+			LastSeen = 2,
+			Status = 3,
+			PricePerMonth = 4,
+			Bedrooms = 5,
+			NumberOfFloorPlans = 6,
+			Location = 7,
+			Url = 8,
+			PostCode = 9,
+			Transit = 10,
+			Walking = 11,
+			Bicycling = 12
+		}
 		public async Task<IEnumerable<string>> GetLocations(bool includeCalculated = false)
 		{
 			var response = await googleSheetsService.Get(propertiesRange);
-			return response.Values.Skip(1).Where(v => includeCalculated || (Convert.ToInt32(v[9]) == -1)).Select(v => (string)v[6]).Distinct().ToArray();
+			return response.Values.Skip(1).Where(v => includeCalculated || (Convert.ToInt32(v[(int)PropertyHeader.Transit]) == -1)).Select(v => (string)v[(int)PropertyHeader.Location]).Distinct().ToArray();
 		}
 
 		public async Task AddTravelTimes(IEnumerable<IGoogleMapsDistanceApiClient.TravelInfo> travelTimes)
