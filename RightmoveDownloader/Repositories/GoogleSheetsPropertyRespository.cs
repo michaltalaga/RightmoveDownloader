@@ -16,7 +16,7 @@ namespace RightmoveDownloader.Repositories
 	{
 		private readonly IGoogleSheetsClient googleSheetsService;
 		private readonly ILogger<GoogleSheetsPropertyRespository> logger;
-		const string propertiesRange = "properties!A:L";
+		const string propertiesRange = "properties!A:M";
 		const string travelTimesRange = "times!A:G";
 		public GoogleSheetsPropertyRespository(IGoogleSheetsClient googleSheetsService, ILogger<GoogleSheetsPropertyRespository> logger)
 		{
@@ -30,6 +30,19 @@ namespace RightmoveDownloader.Repositories
 			var newData = new ValueRange();
 			newData.Values = response.Values ?? new List<IList<object>>();
 			if (newData.Values.Count == 0) newData.Values.Add(GetHeaderRow());
+			bool needsUpdate = AddOrUpdateProperties(properties, newData);
+			if (!needsUpdate)
+			{
+				logger.LogInformation($"AddProperties(properties[{properties.Count()}]) - NOTHING TO UPDATE");
+				return;
+			}
+			FixPropertiesFormulas(newData);
+			await googleSheetsService.Update(newData, propertiesRange);
+			logger.LogInformation($"AddProperties(properties[{properties.Count()}]) - DONE");
+		}
+
+		private static bool AddOrUpdateProperties(IEnumerable<RightmoveHttpClient.Property> properties, ValueRange newData)
+		{
 			var firstRow = newData.Values[0];
 			var needsUpdate = false;
 			var lastSeenTodayString = DateTime.Now.ToString("yyyy-MM-dd");
@@ -50,45 +63,49 @@ namespace RightmoveDownloader.Repositories
 				{
 					needsUpdate = true;
 				}
-				
+
 				existingEntry[(int)PropertyHeader.LastSeen] = DateTime.Now.Date.ToString("yyyy-MM-dd");
-																			 
+
 				existingEntry[(int)PropertyHeader.PricePerMonth] = property.price.frequency == "monthly" ? property.price.amount : property.price.amount * 4;
 				existingEntry[(int)PropertyHeader.Bedrooms] = property.bedrooms;
 				existingEntry[(int)PropertyHeader.NumberOfFloorPlans] = property.numberOfFloorplans;
 				existingEntry[(int)PropertyHeader.Location] = property.location.latitude + "," + property.location.longitude;
 				existingEntry[(int)PropertyHeader.Url] = property.propertyUrl;
 			}
-			if (!needsUpdate)
-			{
-				logger.LogInformation($"AddProperties(properties[{properties.Count()}]) - NOTHING TO UPDATE");
-				return;
-			}
+
+			return needsUpdate;
+		}
+
+		private static void FixPropertiesFormulas(ValueRange newData)
+		{
 			foreach (var row in newData.Values.Skip(1))
 			{
+				var statusCell = (string)row[(int)PropertyHeader.Status];
+				if (statusCell == "new" || string.IsNullOrEmpty(statusCell))
+				{
+					row[(int)PropertyHeader.Status] = "=IFNA(VLOOKUP(INDIRECT(\"A\" & ROW()),statuses!A:B,2,FALSE),\"new\")";
+				}
 				var postCodeCell = (string)row[(int)PropertyHeader.PostCode];
 				if (postCodeCell == "X" || string.IsNullOrEmpty(postCodeCell))
 				{
-					row[(int)PropertyHeader.PostCode] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,2,FALSE),\"X\")";
+					row[(int)PropertyHeader.PostCode] = "=IFNA(VLOOKUP(INDIRECT(\"H\" & ROW()),times!A:G,2,FALSE),\"X\")";
 				}
 				var transitCell = (string)row[(int)PropertyHeader.Transit];
 				if (transitCell == "-1" || string.IsNullOrEmpty(transitCell))
 				{
-					row[(int)PropertyHeader.Transit] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,5,FALSE),-1)";
+					row[(int)PropertyHeader.Transit] = "=IFNA(VLOOKUP(INDIRECT(\"H\" & ROW()),times!A:G,5,FALSE),-1)";
 				}
 				var walkingCell = (string)row[(int)PropertyHeader.Walking];
 				if (walkingCell == "-1" || string.IsNullOrEmpty(walkingCell))
 				{
-					row[(int)PropertyHeader.Walking] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,6,FALSE),-1)";
+					row[(int)PropertyHeader.Walking] = "=IFNA(VLOOKUP(INDIRECT(\"H\" & ROW()),times!A:G,6,FALSE),-1)";
 				}
 				var bicyclingCell = (string)row[(int)PropertyHeader.Bicycling];
 				if (bicyclingCell == "-1" || string.IsNullOrEmpty(bicyclingCell))
 				{
-					row[(int)PropertyHeader.Bicycling] = "=IFNA(VLOOKUP(INDIRECT(\"G\" & ROW()),times!A:G,7,FALSE),-1)";
+					row[(int)PropertyHeader.Bicycling] = "=IFNA(VLOOKUP(INDIRECT(\"H\" & ROW()),times!A:G,7,FALSE),-1)";
 				}
 			}
-			await googleSheetsService.Update(newData, propertiesRange);
-			logger.LogInformation($"AddProperties(properties[{properties.Count()}]) - DONE");
 		}
 
 		private IList<object> GetHeaderRow()
