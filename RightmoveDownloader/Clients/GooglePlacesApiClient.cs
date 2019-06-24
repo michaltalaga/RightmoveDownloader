@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace RightmoveDownloader.Clients
@@ -9,19 +11,28 @@ namespace RightmoveDownloader.Clients
 	public class GooglePlacesApiClient : IGooglePlacesApiClient
 	{
 		private readonly string apiKey;
-		private readonly ILogger<GooglePlacesApiClient> logger;
+        private readonly IHttpClientFactory httpClientFactory;
+        private readonly ILogger<GooglePlacesApiClient> logger;
 
-		public GooglePlacesApiClient(string apiKey, ILogger<GooglePlacesApiClient> logger)
+		public GooglePlacesApiClient(string apiKey, IHttpClientFactory httpClientFactory, ILogger<GooglePlacesApiClient> logger)
 		{
 			this.apiKey = apiKey;
-			this.logger = logger;
+            this.httpClientFactory = httpClientFactory;
+            this.logger = logger;
 		}
 		public async Task<object> FindNearestPlace(string location, string name)
 		{
 			logger.LogInformation($"FindNearestPlace({location},{name})");
-			//https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=primark&inputtype=textquery&fields=name,geometry&locationbias=circle:2000@51.3848465,-0.0848496&key=
-			return null;
-			logger.LogInformation($"FindNearestPlace({location},{name}) - DONE");
+            var url = $"https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input={name}&inputtype=textquery&fields=name,geometry&locationbias=circle:5000@{location}&key=" + apiKey;
+            var client = httpClientFactory.CreateClient();
+            var response = await client.GetAsync(url);
+            var result = await response.Content.ReadAsAsync<GooglePlacesResult>();
+            var placeLocation = result.candidates?[0].geometry.location;
+            if (placeLocation == null) return int.MaxValue;
+            var locationLatLong = location.Split(',').Select(s => double.Parse(s, CultureInfo.InvariantCulture)).ToArray();
+            var meters = Geolocation.GeoCalculator.GetDistance(locationLatLong[0], locationLatLong[1], placeLocation.lat, placeLocation.lng, 0, Geolocation.DistanceUnit.Meters);
+            logger.LogInformation($"FindNearestPlace({location},{name}) - {meters}");
+            return meters;
 		}
 
 		class GooglePlacesResult
@@ -56,14 +67,14 @@ namespace RightmoveDownloader.Clients
 
 		class Northeast
 		{
-			public float lat { get; set; }
-			public float lng { get; set; }
+			public double lat { get; set; }
+			public double lng { get; set; }
 		}
 
 		class Southwest
 		{
-			public float lat { get; set; }
-			public float lng { get; set; }
+			public double lat { get; set; }
+			public double lng { get; set; }
 		}
 	}
 }
