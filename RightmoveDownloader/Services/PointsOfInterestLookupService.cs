@@ -15,7 +15,7 @@ namespace RightmoveDownloader.Services
 			this.logger = logger;
 		}
 
-		public async Task FindPointsOfInterest()
+		public async Task FindPointsOfInterest(IEnumerable<string> names)
 		{
 			logger.LogInformation($"FindPointsOfInterest()");
 			//var locations = await propertyRepository.GetLocations(false);

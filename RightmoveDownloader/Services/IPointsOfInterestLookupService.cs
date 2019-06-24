@@ -7,6 +7,6 @@ namespace RightmoveDownloader.Services
 {
 	public interface IPointsOfInterestLookupService
 	{
-		Task FindPointsOfInterest();
+		Task FindPointsOfInterest(IEnumerable<string> names);
 	}
 }
