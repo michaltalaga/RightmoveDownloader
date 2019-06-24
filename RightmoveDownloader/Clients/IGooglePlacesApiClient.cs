@@ -7,6 +7,6 @@ namespace RightmoveDownloader.Clients
 {
 	public interface IGooglePlacesApiClient
 	{
-		Task<object> GetPointsOfInterest(string location, params string[] names);
+		Task<object> FindNearestPlace(string location, string name);
 	}
 }
