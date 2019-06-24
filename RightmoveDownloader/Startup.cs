@@ -51,6 +51,7 @@ namespace RightmoveDownloader
 			services.AddSingleton<IGoogleMapsDistanceApiClient>(s=>new GoogleMapsDistanceApiClient(configuration.GetValue<string>("GoogleMapsApiKey"), s.GetService<IHttpClientFactory>(), s.GetService<ILogger<GoogleMapsDistanceApiClient>>()));
 			services.AddTransient<IRightmoveDownloadService, RightmoveDownloadService>();
 			services.AddTransient<IDistanceCalculationService, DistanceCalculationService>();
+			services.AddTransient<IPointsOfInterestLookupService, PointsOfInterestLookupService>();
 			services.AddTransient<IPropertyRepository, GoogleSheetsPropertyRespository>();
 			services.AddHangfire(config =>
 			{
@@ -76,6 +77,7 @@ namespace RightmoveDownloader
 			app.UseHangfireServer();
 			recurringJobManager.AddOrUpdate("Download", Job.FromExpression<IRightmoveDownloadService>(service => service.Download(configuration.GetValue<string>("LocationIdentifier"), configuration.GetValue<int>("Radius"), configuration.GetValue<int>("MinBedrooms"), configuration.GetValue<int>("MaxBedrooms"), configuration.GetValue<int>("MinPrice"), configuration.GetValue<int>("MaxPrice"))), configuration.GetValue<string>("DownloadPropertiesSchedule"));
 			recurringJobManager.AddOrUpdate("Calculate Distances", Job.FromExpression<IDistanceCalculationService>(service => service.FindDistances(configuration.GetValue<string>("ToLocation"))), configuration.GetValue<string>("DownloadDistancesSchedule"));
+			recurringJobManager.AddOrUpdate("Find Points of Interest", Job.FromExpression<IPointsOfInterestLookupService>(service => service.FindPointsOfInterest()), configuration.GetValue<string>("FindPointsOfInterestSchedule"));
 		}
 	}
 }
