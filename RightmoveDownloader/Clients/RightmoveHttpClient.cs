@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RightmoveDownloader.Clients
@@ -53,6 +54,7 @@ namespace RightmoveDownloader.Clients
 				}));
 				if (result.pagination.next == null) break;
 				pageIndex = result.pagination.next.Value;
+                Thread.Sleep(500);
 			}
 			return properties;
 		}
