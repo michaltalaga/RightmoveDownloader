@@ -3,7 +3,7 @@
 Given a location and search criteria finds properties and puts them in google sheet for review
 
 
-## Repreqisites
+## Prerequisites
 - Google API Console Project (https://developers.google.com/api-client-library/dotnet/get_started)
   - Service Account
   - Api Key (may require billing account, there is a free tier)
