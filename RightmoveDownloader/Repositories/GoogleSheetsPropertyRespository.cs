@@ -16,7 +16,7 @@ namespace RightmoveDownloader.Repositories
 	{
 		private readonly IGoogleSheetsClient googleSheetsService;
 		private readonly ILogger<GoogleSheetsPropertyRespository> logger;
-		const string propertiesRange = "properties!A:M";
+		const string propertiesRange = "properties!A:N";
 		const string travelTimesRange = "times!A:G";
 		public GoogleSheetsPropertyRespository(IGoogleSheetsClient googleSheetsService, ILogger<GoogleSheetsPropertyRespository> logger)
 		{
@@ -105,6 +105,8 @@ namespace RightmoveDownloader.Repositories
 				{
 					row[(int)PropertyHeader.Bicycling] = "=IFNA(VLOOKUP(INDIRECT(\"H\" & ROW()),times!A:G,7,FALSE),-1)";
 				}
+				var minTimeCell = (string)row[(int)PropertyHeader.MinTime];
+				row[(int)PropertyHeader.MinTime] = "=MIN(K2:M2)";
 			}
 		}
 
@@ -126,7 +128,8 @@ namespace RightmoveDownloader.Repositories
 			PostCode = 9,
 			Transit = 10,
 			Walking = 11,
-			Bicycling = 12
+			Bicycling = 12,
+			MinTime = 13,
 		}
 		public async Task<IEnumerable<string>> GetLocations(bool includeCalculated = false)
 		{
