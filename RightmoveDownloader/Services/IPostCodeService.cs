@@ -1,7 +1,9 @@
-﻿namespace RightmoveDownloader.Services
+﻿using System.Threading.Tasks;
+
+namespace RightmoveDownloader.Services
 {
     public interface IPostCodeService
     {
-        void FindPostCodes();
+        Task FindPostCodes();
     }
 }
