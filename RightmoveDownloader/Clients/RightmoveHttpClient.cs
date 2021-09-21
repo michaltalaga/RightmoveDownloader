@@ -22,7 +22,7 @@ namespace RightmoveDownloader.Clients
 		public async IAsyncEnumerable<IEnumerable<Property>> GetProperties(string locationIdentifier, int radius, int minBedrooms, int maxBedrooms, int minPrice, int maxPrice)
 		{
 			logger.LogInformation($"GetProperties({locationIdentifier}, {radius}, {minBedrooms}, {maxBedrooms}, {minPrice}, {maxPrice})");
-			const int priceStep = 10;
+			int priceStep = (maxPrice - minPrice) / 50;
 			var tasks = new List<Task<IEnumerable<Property>>>();
 			for (int i = minPrice; i <= maxPrice; i += priceStep)
 			{
