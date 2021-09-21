@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using MoreLinq;
 using RightmoveDownloader.Repositories;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Globalization;
 
 namespace RightmoveDownloader.Services
 {
@@ -17,7 +20,12 @@ namespace RightmoveDownloader.Services
         public async Task FindPostCodes()
         {
             logger.LogInformation($"FindPostCodes()");
-            var locations = await propertyRepository.GetLocations(false);
+            var locations = await propertyRepository.GetLocations(true);
+            var postcodesIOClient = new MarkEmbling.PostcodesIO.PostcodesIOClient();
+            foreach (var locationsBatch in locations.Batch(10))
+            {
+                var postCodes = postcodesIOClient.BulkLookupLatLon(locationsBatch.Select(l => new MarkEmbling.PostcodesIO.ReverseGeocodeQuery { Latitude = double.Parse(l.Split(',')[0], CultureInfo.InvariantCulture), Longitude = double.Parse(l.Split(',')[1], CultureInfo.InvariantCulture)  }));
+            }
             logger.LogInformation($"FindPostCodes() - DONE");
         }
     }
