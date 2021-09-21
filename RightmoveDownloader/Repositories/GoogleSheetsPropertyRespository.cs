@@ -66,7 +66,7 @@ namespace RightmoveDownloader.Repositories
 
 				existingEntry[(int)PropertyHeader.LastSeen] = DateTime.Now.Date.ToString("yyyy-MM-dd");
 
-				existingEntry[(int)PropertyHeader.PricePerMonth] = property.price.frequency == "monthly" ? property.price.amount : property.price.amount * 4;
+				existingEntry[(int)PropertyHeader.PricePerMonth] = (property.price.frequency == "monthly" || property.price.frequency == "not specified") ? property.price.amount : property.price.amount * 4;
 				existingEntry[(int)PropertyHeader.Bedrooms] = property.bedrooms;
 				existingEntry[(int)PropertyHeader.NumberOfFloorPlans] = property.numberOfFloorplans;
 				existingEntry[(int)PropertyHeader.Location] = property.location.latitude + "," + property.location.longitude;
