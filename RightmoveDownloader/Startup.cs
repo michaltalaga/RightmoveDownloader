@@ -65,6 +65,7 @@ namespace RightmoveDownloader
                     config.UseMemoryStorage();
                 }
             });
+            services.AddHangfireServer();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,7 +76,6 @@ namespace RightmoveDownloader
             {
                 Authorization = new[] { new NoAuthHangfireFilter() }
             });
-            app.UseHangfireServer();
             recurringJobManager.AddOrUpdate("Download", Job.FromExpression<IRightmoveDownloadService>(service => service.Download(configuration.GetValue<string>("LocationIdentifier"), configuration.GetValue<int>("Radius"), configuration.GetValue<int>("MinBedrooms"), configuration.GetValue<int>("MaxBedrooms"), configuration.GetValue<int>("MinPrice"), configuration.GetValue<int>("MaxPrice"), configuration.GetValue<string>("Channel"))), configuration.GetValue<string>("DownloadPropertiesSchedule"));
             recurringJobManager.AddOrUpdate("Calculate Distances", Job.FromExpression<IDistanceCalculationService>(service => service.FindDistances(configuration.GetValue<string>("ToLocation"))), configuration.GetValue<string>("DownloadDistancesSchedule"));
             recurringJobManager.AddOrUpdate("Find Points of Interest", Job.FromExpression<IPointsOfInterestLookupService>(service => service.FindPointsOfInterest(configuration.GetValue<string>("PointsOfInterest").Split(',', StringSplitOptions.RemoveEmptyEntries))), configuration.GetValue<string>("FindPointsOfInterestSchedule"));
