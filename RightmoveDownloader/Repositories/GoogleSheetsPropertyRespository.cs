@@ -23,7 +23,7 @@ namespace RightmoveDownloader.Repositories
 			this.googleSheetsService = googleSheetsService;
 			this.logger = logger;
 		}
-		public async Task AddProperties(IEnumerable<RightmoveHttpClient.Property> properties)
+		public async Task AddProperties(IEnumerable<IPropertyRepository.Property> properties)
 		{
 			logger.LogInformation($"AddProperties(properties[{properties.Count()}])");
 			var response = await googleSheetsService.Get(propertiesRange);
@@ -41,7 +41,7 @@ namespace RightmoveDownloader.Repositories
 			logger.LogInformation($"AddProperties(properties[{properties.Count()}]) - DONE");
 		}
 
-		private static bool AddOrUpdateProperties(IEnumerable<RightmoveHttpClient.Property> properties, ValueRange newData)
+		private static bool AddOrUpdateProperties(IEnumerable<IPropertyRepository.Property> properties, ValueRange newData)
 		{
 			var firstRow = newData.Values[0];
 			var needsUpdate = false;
@@ -49,11 +49,11 @@ namespace RightmoveDownloader.Repositories
 
 			foreach (var property in properties)
 			{
-				var existingEntry = newData.Values.FirstOrDefault(v => (string)v[(int)PropertyHeader.Id] == property.id);
+				var existingEntry = newData.Values.FirstOrDefault(v => (string)v[(int)PropertyHeader.Id] == property.Id);
 				if (existingEntry == null)
 				{
 					existingEntry = new object[firstRow.Count];
-					existingEntry[(int)PropertyHeader.Id] = property.id;
+					existingEntry[(int)PropertyHeader.Id] = property.Id;
 					existingEntry[(int)PropertyHeader.FirstSeen] = DateTime.Now.Date.ToString("yyyy-MM-dd");
 					existingEntry[(int)PropertyHeader.Status] = "new";
 					newData.Values.Add(existingEntry);
@@ -66,11 +66,11 @@ namespace RightmoveDownloader.Repositories
 
 				existingEntry[(int)PropertyHeader.LastSeen] = DateTime.Now.Date.ToString("yyyy-MM-dd");
 
-				existingEntry[(int)PropertyHeader.PricePerMonth] = (property.price.frequency == "monthly" || property.price.frequency == "not specified") ? property.price.amount : property.price.amount * 4;
-				existingEntry[(int)PropertyHeader.Bedrooms] = property.bedrooms;
-				existingEntry[(int)PropertyHeader.NumberOfFloorPlans] = property.numberOfFloorplans;
-				existingEntry[(int)PropertyHeader.Location] = property.location.latitude + "," + property.location.longitude;
-				existingEntry[(int)PropertyHeader.Url] = property.propertyUrl;
+				existingEntry[(int)PropertyHeader.PricePerMonth] = (property.PriceFrequency == "monthly" || property.PriceFrequency == "not specified") ? property.PriceAmount : property.PriceAmount * 4;
+				existingEntry[(int)PropertyHeader.Bedrooms] = property.Bedrooms;
+				existingEntry[(int)PropertyHeader.NumberOfFloorPlans] = property.NumberOfFloorplans;
+				existingEntry[(int)PropertyHeader.Location] = property.Latitude + "," + property.Longitude;
+				existingEntry[(int)PropertyHeader.Url] = property.PropertyUrl;
 			}
 
 			return needsUpdate;
