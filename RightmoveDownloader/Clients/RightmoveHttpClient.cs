@@ -490,8 +490,8 @@ namespace RightmoveDownloader.Clients
 
 		public class Location2
 		{
-			public string latitude { get; set; }
-			public string longitude { get; set; }
+			public double latitude { get; set; }
+			public double longitude { get; set; }
 		}
 
 		public class Listingupdate1
