@@ -23,5 +23,10 @@ namespace RightmoveDownloader.Repositories
             public double Longitude { get; init; }
             public double Latitude { get; init; }
         }
+        public class LocationPostCode
+        {
+            public string PostCode { get; set; }
+            public string Location { get; set; }
+        }
     }
 }
