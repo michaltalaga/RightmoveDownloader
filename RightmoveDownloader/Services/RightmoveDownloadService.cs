@@ -33,6 +33,7 @@ namespace RightmoveDownloader.Services
                     NumberOfFloorplans = p.numberOfFloorplans,
                     PriceAmount = p.price.amount,
                     PriceFrequency = p.price.frequency,
+                    PriceQualifier = p.price.displayPrices?[0]?.displayPriceQualifier,
                     PropertyUrl = p.propertyUrl,
                     Longitude = p.location.longitude,
                     Latitude = p.location.latitude

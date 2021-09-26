@@ -17,6 +17,7 @@ namespace RightmoveDownloader.Repositories
             public string Id { get; init; }
             public string PriceFrequency { get; init; }
             public int PriceAmount { get; init; }
+            public string PriceQualifier { get; init; }
             public int Bedrooms { get; init; }
             public int NumberOfFloorplans { get; init; }
             public string PropertyUrl { get; init; }
