@@ -160,5 +160,10 @@ namespace RightmoveDownloader.Repositories
 			await googleSheetsService.Append(newData, travelTimesRange);
 			logger.LogInformation($"AddTravelTimes(travelTimes[{travelTimes.Count()}]) - DONE");
 		}
+
+		public async Task AddLocationsPostCodes(IEnumerable<IPropertyRepository.LocationPostCode> locationsPostCodes)
+        {
+			throw new NotImplementedException();
+        }
 	}
 }

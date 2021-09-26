@@ -11,7 +11,7 @@ namespace RightmoveDownloader.Repositories
         Task AddProperties(IEnumerable<Property> properties);
         Task<IEnumerable<string>> GetLocations(bool includeCalculated = false);
         Task AddTravelTimes(IEnumerable<IGoogleMapsDistanceApiClient.TravelInfo> travelTimes);
-
+        Task AddLocationsPostCodes(IEnumerable<LocationPostCode> locationsPostCodes);
         public class Property
         {
             public string Id { get; init; }
