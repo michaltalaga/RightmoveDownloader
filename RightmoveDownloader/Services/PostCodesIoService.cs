@@ -25,6 +25,11 @@ namespace RightmoveDownloader.Services
             foreach (var locationsBatch in locations.Batch(10))
             {
                 var postCodes = postcodesIOClient.BulkLookupLatLon(locationsBatch.Select(l => new MarkEmbling.PostcodesIO.ReverseGeocodeQuery { Latitude = double.Parse(l.Split(',')[0], CultureInfo.InvariantCulture), Longitude = double.Parse(l.Split(',')[1], CultureInfo.InvariantCulture)  }));
+                await propertyRepository.AddLocationsPostCodes(postCodes.Select(pc => new IPropertyRepository.LocationPostCode
+                {
+                    Location = pc.Query.Latitude + "," + pc.Query.Longitude,
+                    PostCode = pc.Result[0].Postcode
+                }));
             }
             logger.LogInformation($"FindPostCodes() - DONE");
         }
