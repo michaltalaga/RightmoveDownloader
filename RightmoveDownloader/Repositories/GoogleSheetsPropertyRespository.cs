@@ -108,8 +108,7 @@ namespace RightmoveDownloader.Repositories
                 {
                     row[(int)PropertyHeader.Bicycling] = "=IFNA(VLOOKUP(INDIRECT(\"J\" & ROW()),times!A:G,7,FALSE),-1)";
                 }
-                //var minTimeCell = (string)row[(int)PropertyHeader.MinTime];
-                //row[(int)PropertyHeader.MinTime] = "=MIN(L2:N2)";
+                row[(int)PropertyHeader.MinTime] = "=MIN(INDIRECT(\"M\" & ROW()):INDIRECT(\"O\" & ROW()))";
             }
         }
 
