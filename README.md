@@ -33,6 +33,7 @@ docker run --name rightmove `
 -e MaxBedrooms=3 `
 -e MinPrice=1400 `
 -e MaxPrice=1800 `
+-e Channel=RENT ` # RENT|BUY
 -e GoogleMapsApiKey=AbcDeFghuJKLMN0pQR0Tz0ABADASQWEADADADc `
 -e GoogleAppName=rightmove `
 -e GoogleSpreadsheetId=1_abcDefGhIj-kLMNoPQ_RsTU0_vw0xY000zabCdefg0 `
@@ -54,6 +55,7 @@ docker run --name rightmove \
 -e MaxBedrooms=3 \
 -e MinPrice=1400 \
 -e MaxPrice=1800 \
+-e Channel=RENT \ # RENT|BUY
 -e GoogleMapsApiKey=AbcDeFghuJKLMN0pQR0Tz0ABADASQWEADADADc \
 -e GoogleAppName=rightmove \
 -e GoogleSpreadsheetId=1_abcDefGhIj-kLMNoPQ_RsTU0_vw0xY000zabCdefg0 \
