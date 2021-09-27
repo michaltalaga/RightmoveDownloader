@@ -34,6 +34,7 @@ namespace RightmoveDownloader.Services
                     PriceAmount = p.price.amount,
                     PriceFrequency = p.price.frequency,
                     PriceQualifier = p.price.displayPrices?[0]?.displayPriceQualifier,
+                    PropertyType = p.propertySubType,
                     PropertyUrl = p.propertyUrl,
                     Longitude = p.location.longitude,
                     Latitude = p.location.latitude

@@ -16,7 +16,7 @@ namespace RightmoveDownloader.Repositories
     {
         private readonly IGoogleSheetsClient googleSheetsService;
         private readonly ILogger<GoogleSheetsPropertyRespository> logger;
-        const string propertiesRange = "properties!A:O";
+        const string propertiesRange = "properties!A:P";
         const string travelTimesRange = "times!A:G";
         const string postCodesRange = "postcodes!A:B";
         public GoogleSheetsPropertyRespository(IGoogleSheetsClient googleSheetsService, ILogger<GoogleSheetsPropertyRespository> logger)
@@ -69,6 +69,7 @@ namespace RightmoveDownloader.Repositories
 
                 existingEntry[(int)PropertyHeader.PricePerMonth] = (property.PriceFrequency == "monthly" || property.PriceFrequency == "not specified") ? property.PriceAmount : property.PriceAmount * 4;
                 existingEntry[(int)PropertyHeader.PriceQualifier] = property.PriceQualifier;
+                existingEntry[(int)PropertyHeader.PropertyType] = property.PropertyType;
                 existingEntry[(int)PropertyHeader.Bedrooms] = property.Bedrooms;
                 existingEntry[(int)PropertyHeader.NumberOfFloorPlans] = property.NumberOfFloorplans;
                 existingEntry[(int)PropertyHeader.Location] = property.Latitude + "," + property.Longitude;
@@ -90,22 +91,22 @@ namespace RightmoveDownloader.Repositories
                 var postCodeCell = (string)row[(int)PropertyHeader.PostCode];
                 if (postCodeCell == "X" || string.IsNullOrEmpty(postCodeCell))
                 {
-                    row[(int)PropertyHeader.PostCode] = "=IFNA(VLOOKUP(INDIRECT(\"I\" & ROW()),times!A:G,2,FALSE),\"X\")";
+                    row[(int)PropertyHeader.PostCode] = "=IFNA(VLOOKUP(INDIRECT(\"J\" & ROW()),times!A:G,2,FALSE),\"X\")";
                 }
                 var transitCell = (string)row[(int)PropertyHeader.Transit];
                 if (transitCell == "-1" || string.IsNullOrEmpty(transitCell))
                 {
-                    row[(int)PropertyHeader.Transit] = "=IFNA(VLOOKUP(INDIRECT(\"I\" & ROW()),times!A:G,5,FALSE),-1)";
+                    row[(int)PropertyHeader.Transit] = "=IFNA(VLOOKUP(INDIRECT(\"J\" & ROW()),times!A:G,5,FALSE),-1)";
                 }
                 var walkingCell = (string)row[(int)PropertyHeader.Walking];
                 if (walkingCell == "-1" || string.IsNullOrEmpty(walkingCell))
                 {
-                    row[(int)PropertyHeader.Walking] = "=IFNA(VLOOKUP(INDIRECT(\"I\" & ROW()),times!A:G,6,FALSE),-1)";
+                    row[(int)PropertyHeader.Walking] = "=IFNA(VLOOKUP(INDIRECT(\"J\" & ROW()),times!A:G,6,FALSE),-1)";
                 }
                 var bicyclingCell = (string)row[(int)PropertyHeader.Bicycling];
                 if (bicyclingCell == "-1" || string.IsNullOrEmpty(bicyclingCell))
                 {
-                    row[(int)PropertyHeader.Bicycling] = "=IFNA(VLOOKUP(INDIRECT(\"I\" & ROW()),times!A:G,7,FALSE),-1)";
+                    row[(int)PropertyHeader.Bicycling] = "=IFNA(VLOOKUP(INDIRECT(\"J\" & ROW()),times!A:G,7,FALSE),-1)";
                 }
                 //var minTimeCell = (string)row[(int)PropertyHeader.MinTime];
                 //row[(int)PropertyHeader.MinTime] = "=MIN(L2:N2)";
@@ -124,15 +125,16 @@ namespace RightmoveDownloader.Repositories
             Status = 3,
             PricePerMonth = 4,
             PriceQualifier = 5,
-            Bedrooms = 6,
-            NumberOfFloorPlans = 7,
-            Location = 8,
-            Url = 9,
-            PostCode = 10,
-            Transit = 11,
-            Walking = 12,
-            Bicycling = 13,
-            MinTime = 14,
+            PropertyType = 6,
+            Bedrooms = 7,
+            NumberOfFloorPlans = 8,
+            Location = 9,
+            Url = 10,
+            PostCode = 11,
+            Transit = 12,
+            Walking = 13,
+            Bicycling = 14,
+            MinTime = 15,
         }
         public async Task<IEnumerable<string>> GetLocations(bool includeCalculated = false)
         {
